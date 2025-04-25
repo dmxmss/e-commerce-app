@@ -1,0 +1,73 @@
+/auth/login:
+  post:
+    description: Create a new user
+    operationId: signUp
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas.yaml#/CreateUserDto"
+    responses:
+      "200":
+        description: User created successfully
+        content: 
+          application/json:
+            schema:
+              $ref: "../components/schemas.yaml#/Tokens"
+      "409":
+        description: User already exists
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas.yaml#/Error"
+      "401":
+        $ref: "../components/errors.yaml#/Unauthorized"
+      "500":
+        $ref: "../components/errors.yaml#/InternalServerError"
+/auth/signup:
+  post:
+    description: Log in to the user
+    operationId: logIn
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas.yaml#/LoginUserDto"
+    responses:
+      "200":
+        description: Logged successfully
+        content: 
+          application/json:
+            schema:
+              $ref: "../components/schemas.yaml#/Tokens"
+      "401":
+        $ref: "../components/errors.yaml#/Unauthorized"
+      "500":
+        $ref: "../components/errors.yaml#/InternalServerError"
+/auth/refresh:
+  post:
+    description: Refresh tokens
+    operationId: refreshTokens
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            properties:
+              refresh_token:
+                type: string
+            required:
+              - refresh_token
+    responses:
+      "200":
+        description: Successfully updated tokens
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas.yaml#/Tokens"
+      "401":
+        $ref: "../components/errors.yaml#/Unauthorized"
+      "500":
+        $ref: "../components/errors.yaml#/InternalServerError"
