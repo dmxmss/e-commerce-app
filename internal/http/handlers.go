@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strconv"
 	"fmt"
+	"log"
 )
 
 func (s Server) SignUp(c echo.Context) error {
@@ -65,8 +66,9 @@ func (s Server) LogIn(c echo.Context) error {
 func (s Server) RefreshTokens(c echo.Context) error {
 	token := c.Get("refresh").(*jwt.Token)
 	r, ok := token.Claims.(*entities.Claims)
+
 	if !ok {
-		return echo.ErrUnauthorized
+		return e.InternalServerError{Err: "error retrieving claims from context"}
 	}
 
 	var request dto.RefreshTokensRequest	

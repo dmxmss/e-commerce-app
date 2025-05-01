@@ -67,6 +67,9 @@ func main() {
 		TokenLookup: "cookie:refresh_token",
 		ContextKey: "refresh",
 		SigningMethod: conf.Auth.SigningMethod,
+		NewClaimsFunc: func(c echo.Context) jwt.Claims {
+			return new(entities.Claims)
+		},
 	})
 
 	auth.POST("/signup", s.SignUp)	
