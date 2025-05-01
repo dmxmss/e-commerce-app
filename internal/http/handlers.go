@@ -38,13 +38,13 @@ func (s Server) SignUp(c echo.Context) error {
 }
 
 func (s Server) LogIn(c echo.Context) error {
-	var loginUser dto.LoginUserRequest
+	var login dto.LoginUserRequest
 
-	if err := c.Bind(&loginUser); err != nil {
+	if err := c.Bind(&login); err != nil {
 		return err
 	}
 
-	user, err := s.userService.LogIn(loginUser)
+	user, err := s.userService.LogIn(login)
 	if err != nil {
 		return err
 	}
@@ -123,6 +123,9 @@ func (s Server) ErrorHandler(err error, c echo.Context) {
 		msg = err.Error()
 	case e.InvalidUserId:
 		code = http.StatusBadRequest
+		msg = err.Error()
+	case e.InvalidCredentials:
+		code = http.StatusUnauthorized
 		msg = err.Error()
 	}
 

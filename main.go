@@ -40,17 +40,17 @@ func main() {
 	e := echo.New()
 	auth := e.Group("/auth")
 
+	e.HTTPErrorHandler = s.ErrorHandler
+
 	e.Use(middleware.Recover())
 	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		LogStatus: true,
 		LogURI:    true,
 		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
-			fmt.Printf("%v %v %v\n", v.Method, v.URI, v.Status)
+			fmt.Printf("%v %v\n", v.URI, v.Status)
 			return nil
 		},
 	}))
-
-	e.HTTPErrorHandler = s.ErrorHandler
 
 	accessMiddleware := echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(conf.Auth.JWTSecret),

@@ -48,6 +48,10 @@ func (s *userService) LogIn(login dto.LoginUserRequest) (*dto.GetUserResponse, e
 		return nil, err
 	}
 
+	if login.Password != user.Password {
+		return nil, e.InvalidCredentials{}
+	}
+
 	response := dto.GetUserResponse{
 		ID: user.ID,
 		Name: user.Name,

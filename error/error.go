@@ -14,6 +14,11 @@ func (AuthFailed) Error() string {
 	return "auth failed"
 }
 
+type InvalidCredentials struct {}
+func (InvalidCredentials) Error() string {
+	return "invalid credentials"
+}
+
 type TokenSigningError struct {}
 func (TokenSigningError) Error() string {
 	return "token signing error"
