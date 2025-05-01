@@ -1,11 +1,14 @@
 package http
 
 import (
-	"github.com/dmxmss/e-commerce-app/internal/dto"
 	"github.com/dmxmss/e-commerce-app/entities"
+	e "github.com/dmxmss/e-commerce-app/error"
+	"github.com/dmxmss/e-commerce-app/internal/dto"
 	"github.com/labstack/echo/v4"
+	"github.com/golang-jwt/jwt/v5"
 
 	"net/http"
+	"strconv"
 )
 
 func (s Server) SignUp(c echo.Context) error {
@@ -20,7 +23,7 @@ func (s Server) SignUp(c echo.Context) error {
 		return err
 	}
 
-	access, refresh, err := s.authService.GenerateTokens(user.ID)
+	access, refresh, err := s.authService.GenerateTokens(strconv.Itoa(user.ID))
 	if err != nil {
 		return err
 	}
@@ -45,7 +48,7 @@ func (s Server) LogIn(c echo.Context) error {
 		return err
 	}
 
-	access, refresh, err := s.authService.GenerateTokens(user.ID)
+	access, refresh, err := s.authService.GenerateTokens(strconv.Itoa(user.ID))
 	if err != nil {
 		return err
 	}
@@ -59,9 +62,9 @@ func (s Server) LogIn(c echo.Context) error {
 }
 
 func (s Server) RefreshTokens(c echo.Context) error {
-	v := c.Get("refresh")
-	r, ok := v.(entities.Claims)
-	if v == nil || !ok {
+	token := c.Get("refresh").(*jwt.Token)
+	r, ok := token.Claims.(*entities.Claims)
+	if !ok {
 		return echo.ErrUnauthorized
 	}
 
@@ -71,7 +74,7 @@ func (s Server) RefreshTokens(c echo.Context) error {
 		return err
 	}
 
-	access, refresh, err := s.authService.GenerateTokens(r.UserId)
+	access, refresh, err := s.authService.GenerateTokens(r.Subject)
 	if err != nil {
 		return err
 	}
@@ -85,14 +88,14 @@ func (s Server) RefreshTokens(c echo.Context) error {
 }
 
 func (s Server) GetUserInfo(c echo.Context) error {
-	v := c.Get("user")
-	userClaims, ok := v.(entities.Claims)
+	token := c.Get("user").(*jwt.Token)
+	claims, ok := token.Claims.(*entities.Claims)
 
-	if v == nil || !ok {
-		return echo.ErrUnauthorized
+	if !ok {
+		return e.InternalServerError{Err: "error retrieving claims from context"}
 	}
 
-	user, err := s.userService.GetUserInfo(userClaims.UserId)		
+	user, err := s.userService.GetUserInfo(claims.Subject)		
 	if err != nil {
 		return err
 	}

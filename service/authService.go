@@ -1,7 +1,6 @@
 package service
 
 import (
-	"github.com/dmxmss/e-commerce-app/entities"
 	"github.com/dmxmss/e-commerce-app/config"
 	"github.com/dmxmss/e-commerce-app/internal/repository"
 	"github.com/golang-jwt/jwt/v5"
@@ -10,9 +9,8 @@ import (
 )
 
 type AuthService interface {
-	ValidateToken(string) (*entities.Claims, error)
-	GenerateToken(int, int) (string, error)
-	GenerateTokens(int) (string, string, error)
+	GenerateToken(string, int) (string, error)
+	GenerateTokens(string) (string, string, error)
 }
 
 type authService struct {
@@ -34,22 +32,17 @@ func NewAuthService(conf *config.Config) (AuthService, error) {
 	}, nil
 }
 
-func (s *authService) ValidateToken(rawToken string) (*entities.Claims, error) {
-	return s.authRepo.ValidateToken(rawToken)
-}
-
-func (s *authService) GenerateToken(userId, expiration int) (string, error) {
-	claims := entities.Claims{
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(expiration))),
-		},
+func (s *authService) GenerateToken(userId string, expiration int) (string, error) {
+	claims := jwt.RegisteredClaims{
+		Subject: userId,	
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(expiration)*time.Second)),
 	}
 	token, err := s.authRepo.GenerateAndSignToken(claims)
 	
 	return token, err
 }
 
-func (s *authService) GenerateTokens(userId int) (string, string, error) {
+func (s *authService) GenerateTokens(userId string) (string, string, error) {
 	access, err := s.GenerateToken(userId, s.accessExpiration)
 	if err != nil {
 		return "", "", err

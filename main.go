@@ -2,19 +2,20 @@ package main
 
 import (
 	"github.com/dmxmss/e-commerce-app/config"
+	"github.com/dmxmss/e-commerce-app/entities"
 	"github.com/dmxmss/e-commerce-app/internal/http"
+	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	"fmt"
-	"log"
 )
 
 func main() {
 	conf := config.GetConfig()
-	log.Printf("%d", conf.Auth.Access.Expiration)
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		conf.Database.Host,
@@ -38,16 +39,32 @@ func main() {
 
 	e := echo.New()
 	auth := e.Group("/auth")
+
+	e.Use(middleware.Recover())
+	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogStatus: true,
+		LogURI:    true,
+		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+			fmt.Printf("%v %v %v\n", v.Method, v.URI, v.Status)
+			return nil
+		},
+	}))
+
 	accessMiddleware := echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(conf.Auth.JWTSecret),
-		TokenLookup: "header:Authorization",
+		TokenLookup: "header:Authorization:Bearer ",
 		ContextKey: "user",
+		SigningMethod: conf.Auth.SigningMethod,
+		NewClaimsFunc: func(c echo.Context) jwt.Claims {
+			return new(entities.Claims)
+		},
 	})
 
 	refreshMiddleware := echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(conf.Auth.JWTSecret),
 		TokenLookup: "cookie:refresh_token",
 		ContextKey: "refresh",
+		SigningMethod: conf.Auth.SigningMethod,
 	})
 
 	auth.POST("/signup", s.SignUp)	

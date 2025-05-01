@@ -44,10 +44,14 @@ func (u *userRepository) CreateUser(createUser dto.CreateUserRequest) (*entities
 
 func (u *userRepository) GetUserBy(getUser dto.GetUserRequest) (*entities.User, error) {
 	var user entities.User	
-	query := u.db.Model(&entities.User{})
+	query := u.db.Model(&user)
 
 	if getUser.Name == "" && getUser.Email == "" && getUser.ID == nil {
 		return nil, nil
+	}
+
+	if getUser.ID != nil {
+		query = query.Where("id = ?", getUser.ID)
 	}
 
 	if getUser.Name != "" {
