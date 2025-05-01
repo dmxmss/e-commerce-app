@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"strconv"
 	"fmt"
-	"log"
 )
 
 func (s Server) SignUp(c echo.Context) error {
@@ -25,7 +24,7 @@ func (s Server) SignUp(c echo.Context) error {
 		return err
 	}
 
-	access, refresh, err := s.authService.GenerateTokens(strconv.Itoa(user.ID))
+	access, refresh, err := s.authService.GenerateTokens(strconv.Itoa(user.ID), user.Admin)
 	if err != nil {
 		return err
 	}
@@ -50,12 +49,12 @@ func (s Server) LogIn(c echo.Context) error {
 		return err
 	}
 
-	access, refresh, err := s.authService.GenerateTokens(strconv.Itoa(user.ID))
+	access, refresh, err := s.authService.GenerateTokens(strconv.Itoa(user.ID), user.Admin)
 	if err != nil {
 		return err
 	}
 
-	response := dto.CreateUserResponse{
+	response := dto.LoginUserResponse{
 		AccessToken: access,
 		RefreshToken: refresh,
 	}
@@ -77,7 +76,7 @@ func (s Server) RefreshTokens(c echo.Context) error {
 		return err
 	}
 
-	access, refresh, err := s.authService.GenerateTokens(r.Subject)
+	access, refresh, err := s.authService.GenerateTokens(r.Subject, r.Admin)
 	if err != nil {
 		return err
 	}
@@ -107,6 +106,7 @@ func (s Server) GetUserInfo(c echo.Context) error {
 		ID: user.ID,
 		Name: user.Name,
 		Email: user.Email,
+		Admin: user.Admin,
 	}
 
 	return c.JSON(http.StatusOK, response)

@@ -37,6 +37,7 @@ func (s *userService) CreateUser(createUser dto.CreateUserRequest) (*dto.GetUser
 		ID: user.ID,
 		Name: user.Name,
 		Email: user.Email,
+		Admin: user.Admin,
 	}
 
 	return &response, nil
@@ -56,6 +57,7 @@ func (s *userService) LogIn(login dto.LoginUserRequest) (*dto.GetUserResponse, e
 		ID: user.ID,
 		Name: user.Name,
 		Email: user.Email,
+		Admin: user.Admin,
 	}
 
 	return &response, nil
@@ -76,6 +78,7 @@ func (s *userService) GetUserInfo(userId string) (*dto.GetUserResponse, error) {
 		ID: user.ID,
 		Name: user.Name,
 		Email: user.Email,
+		Admin: user.Admin,
 	}
 
 	return &response, nil
