@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/dmxmss/e-commerce-app/config"
 	"github.com/dmxmss/e-commerce-app/entities"
-	"github.com/dmxmss/e-commerce-app/internal/http"
+	http "github.com/dmxmss/e-commerce-app/internal/http"
 	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -49,6 +49,8 @@ func main() {
 			return nil
 		},
 	}))
+
+	e.HTTPErrorHandler = s.ErrorHandler
 
 	accessMiddleware := echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(conf.Auth.JWTSecret),

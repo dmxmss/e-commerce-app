@@ -33,7 +33,7 @@ func (u *userRepository) CreateUser(createUser dto.CreateUserRequest) (*entities
 
 	if err := u.db.Create(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			return nil, e.UserAlreadyExists{Name: createUser.Name}
+			return nil, e.UserAlreadyExists{}
 		} else {
 			return nil, e.DbTransactionFailed{Err: err}
 		}
@@ -50,16 +50,16 @@ func (u *userRepository) GetUserBy(getUser dto.GetUserRequest) (*entities.User, 
 		return nil, nil
 	}
 
-	if getUser.ID != nil {
-		query = query.Where("id = ?", getUser.ID)
-	}
-
 	if getUser.Name != "" {
 		query = query.Where("id = ?", getUser.Name)		
 	}
 
 	if getUser.Email != "" {
 		query = query.Where("email = ?", getUser.Email)		
+	}
+
+	if getUser.ID != nil {
+		query = query.Where("id = ?", getUser.ID)
 	}
 
 	if err := query.First(&user).Error; err != nil {

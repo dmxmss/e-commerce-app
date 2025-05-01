@@ -14,26 +14,14 @@ func (AuthFailed) Error() string {
 	return "auth failed"
 }
 
-type TokenExpired struct {}
-func (TokenExpired) Error() string {
-	return "token has expired"
-}
-
-type TokenInvalid struct {}
-func (TokenInvalid) Error() string {
-	return "token is invalid"
-}
-
 type TokenSigningError struct {}
 func (TokenSigningError) Error() string {
 	return "token signing error"
 }
 
-type UserAlreadyExists struct {
-	Name string `json:"name"`
-}
+type UserAlreadyExists struct {}
 func (e UserAlreadyExists) Error() string {
-	return fmt.Sprintf("user with name %s already exists", e.Name)
+	return "user with these credentials already exists"
 }
 
 type UserNotFound struct {

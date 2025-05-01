@@ -12,6 +12,7 @@ type ServerInterface interface {
 	LogIn(echo.Context) error
 	RefreshTokens(echo.Context) error
 	GetUserInfo(echo.Context) error
+	ErrorHandler(error, echo.Context)
 }
 
 type Server struct {
