@@ -43,6 +43,13 @@ func (e InvalidUserId) Error() string {
 	return fmt.Sprintf("invalid user id: %s", e.ID)
 }
 
+type ProductNotFound struct {
+	ID int `json:"id"`
+}
+func (e ProductNotFound) Error() string {
+	return fmt.Sprintf("product with id %d not found", e.ID)
+}
+
 type DbTransactionFailed struct {
 	Err error
 }

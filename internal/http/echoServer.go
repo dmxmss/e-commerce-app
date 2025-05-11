@@ -12,12 +12,15 @@ type ServerInterface interface {
 	LogIn(echo.Context) error
 	RefreshTokens(echo.Context) error
 	GetUserInfo(echo.Context) error
+	CreateProduct(echo.Context) error
+	DeleteProduct(echo.Context) error
 	ErrorHandler(error, echo.Context)
 }
 
 type Server struct {
 	authService service.AuthService
 	userService service.UserService
+	productService service.ProductService
 }
 
 func NewEchoServer(conf *config.Config, db *gorm.DB) (ServerInterface, error) {
@@ -28,8 +31,11 @@ func NewEchoServer(conf *config.Config, db *gorm.DB) (ServerInterface, error) {
 
 	userService := service.NewUserService(db)
 
+	productService := service.NewProductService(db)
+
 	return &Server{
 		authService: authService,
 		userService: userService,
+		productService: productService,
 	}, nil
 }

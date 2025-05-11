@@ -39,6 +39,7 @@ func main() {
 
 	e := echo.New()
 	auth := e.Group("/auth")
+	products := e.Group("/products")
 
 	e.HTTPErrorHandler = s.ErrorHandler
 
@@ -75,6 +76,9 @@ func main() {
 	auth.POST("/signup", s.SignUp)	
 	auth.POST("/login", s.LogIn)	
 	auth.POST("/refresh", s.RefreshTokens, refreshMiddleware)	
+
+	products.POST("/", s.CreateProduct)
+	products.DELETE("/{id}", s.DeleteProduct)
 
 	e.GET("/me", s.GetUserInfo, accessMiddleware)
 
