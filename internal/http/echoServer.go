@@ -4,8 +4,11 @@ import (
 	"github.com/dmxmss/e-commerce-app/config"
 	"github.com/dmxmss/e-commerce-app/service"
 	"github.com/dmxmss/e-commerce-app/internal/repository"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
+
+	"fmt"
 )
 
 type ServerInterface interface {
@@ -16,17 +19,20 @@ type ServerInterface interface {
 	CreateProduct(echo.Context) error
 	DeleteProduct(echo.Context) error
 	ErrorHandler(error, echo.Context)
+
+	Start()
 }
 
 type Server struct {
+	echo *echo.Echo
 	service Service
+	conf *config.Config
 }
 
 type Service struct {
 	auth service.AuthService
 	user service.UserService
 	product service.ProductService
-
 }
 
 func NewEchoServer(conf *config.Config, db *gorm.DB) (ServerInterface, error) {
@@ -44,11 +50,59 @@ func NewEchoServer(conf *config.Config, db *gorm.DB) (ServerInterface, error) {
 	userService := service.NewUserService(db, userRepo)
 	productService := service.NewProductService(db)
 
-	return &Server{
+	echo := echo.New()
+
+	s := Server{
+		echo,
 		Service{
 			auth: authService,
 			user: userService,
 			product: productService,
 		},
-	}, nil
+		conf,
+	}
+
+	s.setUpRouter()
+
+	return &s, nil
+}
+
+func (s Server) Start() {
+	s.echo.Logger.Fatal(
+		s.echo.Start(
+			fmt.Sprintf("%s:%d", 
+				s.conf.App.Address, 
+				s.conf.App.Port,
+			),
+		),
+	)
+}
+
+func (s Server) setUpRouter() { // routes, middleware
+	auth := s.echo.Group("/auth")
+	products := s.echo.Group("/products")
+
+	s.echo.HTTPErrorHandler = s.ErrorHandler
+
+	s.echo.Use(middleware.Recover())
+	s.echo.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogStatus: true,
+		LogURI:    true,
+		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+			fmt.Printf("%v %v\n", v.URI, v.Status)
+			return nil
+		},
+	}))
+
+	accessMiddleware := GetAccessMiddleware(s.conf.Auth.JWTSecret, s.conf.Auth.SigningMethod)
+	refreshMiddleware := GetRefreshMiddleware(s.conf.Auth.JWTSecret, s.conf.Auth.SigningMethod)
+
+	auth.POST("/signup", s.SignUp)	
+	auth.POST("/login", s.LogIn)	
+	auth.POST("/refresh", s.RefreshTokens, refreshMiddleware)	
+
+	products.POST("/", s.CreateProduct)
+	products.DELETE("/{id}", s.DeleteProduct)
+
+	s.echo.GET("/me", s.GetUserInfo, accessMiddleware)
 }

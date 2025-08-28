@@ -2,12 +2,7 @@ package main
 
 import (
 	"github.com/dmxmss/e-commerce-app/config"
-	"github.com/dmxmss/e-commerce-app/entities"
 	http "github.com/dmxmss/e-commerce-app/internal/http"
-	"github.com/golang-jwt/jwt/v5"
-	echojwt "github.com/labstack/echo-jwt/v4"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -37,50 +32,6 @@ func main() {
 		panic(err)
 	}
 
-	e := echo.New()
-	auth := e.Group("/auth")
-	products := e.Group("/products")
 
-	e.HTTPErrorHandler = s.ErrorHandler
-
-	e.Use(middleware.Recover())
-	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
-		LogStatus: true,
-		LogURI:    true,
-		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
-			fmt.Printf("%v %v\n", v.URI, v.Status)
-			return nil
-		},
-	}))
-
-	accessMiddleware := echojwt.WithConfig(echojwt.Config{
-		SigningKey: []byte(conf.Auth.JWTSecret),
-		TokenLookup: "header:Authorization:Bearer ",
-		ContextKey: "user",
-		SigningMethod: conf.Auth.SigningMethod,
-		NewClaimsFunc: func(c echo.Context) jwt.Claims {
-			return new(entities.Claims)
-		},
-	})
-
-	refreshMiddleware := echojwt.WithConfig(echojwt.Config{
-		SigningKey: []byte(conf.Auth.JWTSecret),
-		TokenLookup: "cookie:refresh_token",
-		ContextKey: "refresh",
-		SigningMethod: conf.Auth.SigningMethod,
-		NewClaimsFunc: func(c echo.Context) jwt.Claims {
-			return new(entities.Claims)
-		},
-	})
-
-	auth.POST("/signup", s.SignUp)	
-	auth.POST("/login", s.LogIn)	
-	auth.POST("/refresh", s.RefreshTokens, refreshMiddleware)	
-
-	products.POST("/", s.CreateProduct)
-	products.DELETE("/{id}", s.DeleteProduct)
-
-	e.GET("/me", s.GetUserInfo, accessMiddleware)
-
-	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", conf.App.Address, conf.App.Port)))
+	s.Start()
 }
