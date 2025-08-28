@@ -10,13 +10,19 @@ import (
 )
 
 func (s Server) CreateProduct(c echo.Context) error {
-	var createProduct dto.CreateProductRequest
+	var request dto.CreateProductRequest
 
-	if err := c.Bind(&createProduct); err != nil {
+	if err := c.Bind(&request); err != nil {
 		return err
 	}
 
-	product, err := s.productService.CreateProduct(createProduct)
+	product, err := s.service.product.CreateProduct(
+		request.Name, 
+		request.Description, 
+		request.Vendor, 
+		request.Price, 
+		request.Tags,
+	)
 	if err != nil {
 		return err
 	}
@@ -43,11 +49,7 @@ func (s Server) DeleteProduct(c echo.Context) error {
 		return echo.ErrBadRequest
 	}
 
-	request := dto.DeleteProductRequest{
-		ID: id,
-	}
-
-	if err := s.productService.DeleteProduct(request); err != nil {
+	if err := s.service.product.DeleteProduct(id); err != nil {
 		return err
 	}
 

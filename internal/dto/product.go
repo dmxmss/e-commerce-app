@@ -31,21 +31,21 @@ type GetProductRequest struct {
 type GetProductResponse = Product
 
 type GetProductsRequest struct {
-	Name string `json:"name;omitempty"`
-	Vendor string `json:"vendor;omitempty"`
+	Name string `json:"name,omitempty"`
+	Vendor string `json:"vendor,omitempty"`
 	Tags []string `json:"tags"`
-	Price int `json:"price;omitempty"`
+	Price int `json:"price,omitempty"`
 }
 
 type GetProductsResponse = []Product
 
 type UpdateProductRequest struct {
 	ID int `json:"id"`
-	Name string `json:"name;omitempty"`
-	Description string `json:"description;omitempty"`
-	Vendor string `json:"vendor;omitempty"`
-	Tags []string `json:"tags;omitempty"`
-	Price int `json:"price;omitempty"`
+	Name string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
+	Vendor string `json:"vendor,omitempty"`
+	Tags []string `json:"tags,omitempty"`
+	Price int `json:"price,omitempty"`
 }
 
 type UpdateProductResponse = Product

@@ -3,49 +3,54 @@ package service
 import (
 	"github.com/dmxmss/e-commerce-app/entities"
 	"github.com/dmxmss/e-commerce-app/internal/repository"
-	"github.com/dmxmss/e-commerce-app/internal/dto"
 	"gorm.io/gorm"
 
 	"strings"
 )
 
 type ProductService interface {
-	CreateProduct(dto.CreateProductRequest) (*entities.Product, error)
-	DeleteProduct(dto.DeleteProductRequest) error
+	CreateProduct(string, string, string, int, []string) (*entities.Product, error)
+	DeleteProduct(int) error
+}
+
+type productServiceRepo struct { // repositories product service needs
+	product repository.ProductRepository
 }
 
 type productService struct {
-	productRepo repository.ProductRepository
+	repo productServiceRepo
 }
 
 func NewProductService(db *gorm.DB) ProductService {
 	productRepo := repository.NewProductRepository(db)
 
 	return &productService{
-		productRepo: productRepo,
+		repo: productServiceRepo{
+			product: productRepo,
+		},
 	}
 }
 
-func (s *productService) CreateProduct(createProduct dto.CreateProductRequest) (*entities.Product, error) {
-	concatTags := strings.Join(createProduct.Tags, ",")
+func (s *productService) CreateProduct(name, description, vendor string, price int, tags []string) (*entities.Product, error) {
+	concatTags := strings.Join(tags, ",")
 
 	product := entities.Product{
-		Name: createProduct.Name,
-		Description: createProduct.Description,
-		Vendor: createProduct.Vendor,
-		Price: createProduct.Price,
+		Name: name,
+		Description: description,
+		Vendor: vendor,
+		Price: price,
 		Tags: concatTags,
 	}
 
-	response, err := s.productRepo.CreateProduct(product)
+	response, err := s.repo.product.CreateProduct(product)
 
 	return response, err
 }
 
-func (s *productService) DeleteProduct(deleteProduct dto.DeleteProductRequest) error {
+func (s *productService) DeleteProduct(id int) error {
 	product := entities.Product{
-		ID: deleteProduct.ID,
+		ID: id,
 	}
 
-	return s.productRepo.DeleteProduct(product)
+	return s.repo.product.DeleteProduct(product)
 }

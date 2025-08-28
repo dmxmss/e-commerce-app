@@ -10,8 +10,8 @@ import (
 )
 
 type UserRepository interface {
-	CreateUser(dto.CreateUserRequest) (*entities.User, error)
-	GetUserBy(dto.GetUserRequest) (*entities.User, error)
+	CreateUser(user entities.User) (*entities.User, error)
+	GetUserBy(dto.GetUserBy) (*entities.User, error)
 }
 
 type userRepository struct {
@@ -24,13 +24,7 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 	}
 }
 
-func (u *userRepository) CreateUser(createUser dto.CreateUserRequest) (*entities.User, error) {
-	user := entities.User{
-		Name: createUser.Name, 
-		Email: createUser.Email,
-		Password: createUser.Password,
-	}
-
+func (u *userRepository) CreateUser(user entities.User) (*entities.User, error) {
 	if err := u.db.Create(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
 			return nil, e.UserAlreadyExists{}
@@ -42,29 +36,29 @@ func (u *userRepository) CreateUser(createUser dto.CreateUserRequest) (*entities
 	return &user, nil
 }
 
-func (u *userRepository) GetUserBy(getUser dto.GetUserRequest) (*entities.User, error) {
+func (u *userRepository) GetUserBy(request dto.GetUserBy) (*entities.User, error) { // only one field in request must be non nil
 	var user entities.User	
 	query := u.db.Model(&user)
 
-	if getUser.Name == "" && getUser.Email == "" && getUser.ID == nil {
+	if request.Name == "" && request.Email == "" && request.ID == nil {
 		return nil, nil
 	}
 
-	if getUser.Name != "" {
-		query = query.Where("id = ?", getUser.Name)		
+	if request.Name != "" {
+		query = query.Where("name = ?", request.Name)		
 	}
 
-	if getUser.Email != "" {
-		query = query.Where("email = ?", getUser.Email)		
+	if request.Email != "" {
+		query = query.Where("email = ?", request.Email)		
 	}
 
-	if getUser.ID != nil {
-		query = query.Where("id = ?", getUser.ID)
+	if request.ID != nil {
+		query = query.Where("id = ?", request.ID)
 	}
 
 	if err := query.First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, e.UserNotFound{Name: getUser.Name}
+			return nil, e.UserNotFound{Name: request.Name}
 		} else {
 			return nil, e.DbTransactionFailed{Err: err}
 		}

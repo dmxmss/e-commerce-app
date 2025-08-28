@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/dmxmss/e-commerce-app/internal/dto"
 	e "github.com/dmxmss/e-commerce-app/error"
+	"github.com/dmxmss/e-commerce-app/entities"
 	"github.com/dmxmss/e-commerce-app/internal/repository"
 	"gorm.io/gorm"
 
@@ -10,76 +11,35 @@ import (
 )
 
 type UserService interface {
-	CreateUser(dto.CreateUserRequest) (*dto.GetUserResponse, error)
-	LogIn(dto.LoginUserRequest) (*dto.GetUserResponse, error)
-	GetUserInfo(string) (*dto.GetUserResponse, error)
+	GetUserInfo(string) (*entities.User, error)
+}
+
+type userServiceRepo struct { // repositories user service needs
+	user repository.UserRepository
 }
 
 type userService struct {
-	userRepo repository.UserRepository
+	repo userServiceRepo
 }
 
-func NewUserService(db *gorm.DB) UserService {
-	userRepo := repository.NewUserRepository(db)
-
+func NewUserService(db *gorm.DB, userRepo repository.UserRepository) UserService {
 	return &userService{
-		userRepo: userRepo,
+		repo: userServiceRepo{
+			user: userRepo,
+		},
 	}
 }
 
-func (s *userService) CreateUser(createUser dto.CreateUserRequest) (*dto.GetUserResponse, error) {
-	user, err := s.userRepo.CreateUser(createUser)
-	if err != nil {
-		return nil, err
-	}
-
-	response := dto.GetUserResponse{
-		ID: user.ID,
-		Name: user.Name,
-		Email: user.Email,
-		Admin: user.Admin,
-	}
-
-	return &response, nil
-}
-
-func (s *userService) LogIn(login dto.LoginUserRequest) (*dto.GetUserResponse, error) {
-	user, err := s.userRepo.GetUserBy(dto.GetUserRequest{Email: login.Email})
-	if err != nil {
-		return nil, err
-	}
-
-	if login.Password != user.Password {
-		return nil, e.InvalidCredentials{}
-	}
-
-	response := dto.GetUserResponse{
-		ID: user.ID,
-		Name: user.Name,
-		Email: user.Email,
-		Admin: user.Admin,
-	}
-
-	return &response, nil
-}
-
-func (s *userService) GetUserInfo(userId string) (*dto.GetUserResponse, error) {
+func (s *userService) GetUserInfo(userId string) (*entities.User, error) {
 	id, err := strconv.Atoi(userId)
 	if err != nil {
 		return nil, e.InvalidUserId{ID: userId}
 	}
 
-	user, err := s.userRepo.GetUserBy(dto.GetUserRequest{ID: &id})
+	user, err := s.repo.user.GetUserBy(dto.GetUserBy{ID: &id})
 	if err != nil {
 		return nil, err
 	}
 
-	response := dto.GetUserResponse{
-		ID: user.ID,
-		Name: user.Name,
-		Email: user.Email,
-		Admin: user.Admin,
-	}
-
-	return &response, nil
+	return user, nil
 }

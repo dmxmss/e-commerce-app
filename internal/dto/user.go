@@ -11,21 +11,21 @@ type CreateUserResponse struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
-type LoginUserRequest struct {
+type LoginRequest struct {
 	Name string `json:"name"`
 	Email string `json:"email"`
 	Password string `json:"password"`
 }
 
-type LoginUserResponse struct {
+type LoginResponse struct {
 	AccessToken string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
 
-type GetUserRequest struct {
-	ID *int `json:"id;omitempty"`
-	Name string `json:"name;omitempty"`
-	Email string `json:"email;omitempty"`
+type GetUserBy struct { // only one field must be non nil
+	ID *int `json:"id,omitempty"`
+	Name string `json:"name,omitempty"`
+	Email string `json:"email,omitempty"`
 }
 
 type GetUserResponse struct {

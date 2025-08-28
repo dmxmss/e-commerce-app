@@ -35,7 +35,7 @@ type (
 	}
 
 	Token struct {
-		Expiration int
+		Expiration int // seconds
 	}
 )
 

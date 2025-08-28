@@ -8,54 +8,43 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 
 	"net/http"
-	"strconv"
 )
 
 func (s Server) SignUp(c echo.Context) error {
-	var createUser dto.CreateUserRequest
+	var request dto.CreateUserRequest
 
-	if err := c.Bind(&createUser); err != nil {
+	if err := c.Bind(&request); err != nil {
 		return err
 	}
 
-	user, err := s.userService.CreateUser(createUser)
-	if err != nil {
-		return err
-	}
-
-	access, refresh, err := s.authService.GenerateTokens(strconv.Itoa(user.ID), user.Admin)
+	_, accessToken, refreshToken, err := s.service.auth.SignUp(request.Name, request.Email, request.Password)
 	if err != nil {
 		return err
 	}
 
 	response := dto.CreateUserResponse{
-		AccessToken: access,
-		RefreshToken: refresh,
+		AccessToken: accessToken,
+		RefreshToken: refreshToken,
 	}
 
 	return c.JSON(http.StatusOK, response)
 }
 
 func (s Server) LogIn(c echo.Context) error {
-	var login dto.LoginUserRequest
+	var request dto.LoginRequest
 
-	if err := c.Bind(&login); err != nil {
+	if err := c.Bind(&request); err != nil {
 		return err
 	}
 
-	user, err := s.userService.LogIn(login)
+	_, accessToken, refreshToken, err := s.service.auth.Login(request.Name, request.Password)
 	if err != nil {
 		return err
 	}
 
-	access, refresh, err := s.authService.GenerateTokens(strconv.Itoa(user.ID), user.Admin)
-	if err != nil {
-		return err
-	}
-
-	response := dto.LoginUserResponse{
-		AccessToken: access,
-		RefreshToken: refresh,
+	response := dto.LoginResponse{
+		AccessToken: accessToken,
+		RefreshToken: refreshToken,
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -69,45 +58,15 @@ func (s Server) RefreshTokens(c echo.Context) error {
 		return e.InternalServerError{Err: "error retrieving claims from context"}
 	}
 
-	var request dto.RefreshTokensRequest	
-
-	if err := c.Bind(&request); err != nil {
-		return err
-	}
-
-	access, refresh, err := s.authService.GenerateTokens(r.Subject, r.Admin)
+	accessToken, refreshToken, err := s.service.auth.GenerateTokens(r.Admin, r.Subject)
 	if err != nil {
 		return err
 	}
 
 	response := dto.RefreshTokensResponse{
-		AccessToken: access,
-		RefreshToken: refresh,
+		AccessToken: accessToken,
+		RefreshToken: refreshToken,
 	}
 
 	return c.JSON(http.StatusOK, response)
 }
-
-func (s Server) GetUserInfo(c echo.Context) error {
-	token := c.Get("user").(*jwt.Token)
-	claims, ok := token.Claims.(*entities.Claims)
-
-	if !ok {
-		return e.InternalServerError{Err: "error retrieving claims from context"}
-	}
-
-	user, err := s.userService.GetUserInfo(claims.Subject)		
-	if err != nil {
-		return err
-	}
-
-	response := dto.GetUserResponse{
-		ID: user.ID,
-		Name: user.Name,
-		Email: user.Email,
-		Admin: user.Admin,
-	}
-
-	return c.JSON(http.StatusOK, response)
-}
-
