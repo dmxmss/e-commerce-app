@@ -2,14 +2,16 @@ package service
 
 import (
 	"github.com/dmxmss/e-commerce-app/entities"
+	"github.com/dmxmss/e-commerce-app/internal/dto"
 	"github.com/dmxmss/e-commerce-app/internal/repository"
 	"gorm.io/gorm"
 
-	"strings"
+	"fmt"
 )
 
 type ProductService interface {
-	CreateProduct(string, string, string, int, []string) (*entities.Product, error)
+	CreateProduct(string, string, int, int, int, string) (*entities.Product, error)
+	GetUserProducts(int) ([]entities.Product, error)
 	DeleteProduct(int) error
 }
 
@@ -31,15 +33,19 @@ func NewProductService(db *gorm.DB) ProductService {
 	}
 }
 
-func (s *productService) CreateProduct(name, description, vendor string, price int, tags []string) (*entities.Product, error) {
-	concatTags := strings.Join(tags, ",")
+func (s *productService) CreateProduct(name, description string, vendor, remaining, price int, categoryName string) (*entities.Product, error) {
+	category, err := s.repo.product.GetCategoryByName(categoryName)
+	if err != nil {
+		return nil, err
+	}
 
 	product := entities.Product{
 		Name: name,
 		Description: description,
 		Vendor: vendor,
+		Remaining: remaining,
 		Price: price,
-		Tags: concatTags,
+		Category: *category,
 	}
 
 	response, err := s.repo.product.CreateProduct(product)
@@ -53,4 +59,14 @@ func (s *productService) DeleteProduct(id int) error {
 	}
 
 	return s.repo.product.DeleteProduct(product)
+}
+
+func (s *productService) GetUserProducts(id int) ([]entities.Product, error) {
+	fmt.Printf("aoirrntorie %v, %d", dto.GetProductsBy{Vendor: &id}, id)
+	products, err := s.repo.product.GetProductsBy(dto.GetProductsBy{Vendor: &id})
+	if err != nil {
+		return nil, err
+	}
+
+	return products, nil
 }

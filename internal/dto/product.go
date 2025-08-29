@@ -7,19 +7,21 @@ import (
 type Product struct {
 	ID int `json:"id"`
 	CreatedAt time.Time `json:"createdTime"`
+	UpdatedAt time.Time `json:"updatedTime"`
 	Name string `json:"name"`
 	Description string `json:"description"`
-	Vendor string `json:"vendor"`
+	Vendor int `json:"vendor"`
+	Remaining int `json:"remaining"`
 	Price int `json:"price"`
-	Tags []string `json:"tags"`
+	Category string `json:"category"`
 }
 
 type CreateProductRequest struct {
 	Name string `json:"name"`
-	Description string `json:"description"`
-	Vendor string `json:"vendor"`
+	Description string `json:"description,omitempty"`
+	Remaining int `json:"remaining"`
 	Price int `json:"price"`
-	Tags []string `json:"tags"`
+	Category string `json:"category"`
 }
 
 type CreateProductResponse = Product
@@ -28,13 +30,11 @@ type GetProductRequest struct {
 	ID *int `json:"id"`
 }
 
-type GetProductResponse = Product
-
-type GetProductsRequest struct {
+type GetProductsBy struct {
+	ID *int `json:"id,omitempty"`
 	Name string `json:"name,omitempty"`
-	Vendor string `json:"vendor,omitempty"`
-	Tags []string `json:"tags"`
-	Price int `json:"price,omitempty"`
+	Vendor *int `json:"vendor,omitempty"`
+	Category string `json:"category,omitempty"`
 }
 
 type GetProductsResponse = []Product
@@ -43,9 +43,9 @@ type UpdateProductRequest struct {
 	ID int `json:"id"`
 	Name string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
-	Vendor string `json:"vendor,omitempty"`
-	Tags []string `json:"tags,omitempty"`
-	Price int `json:"price,omitempty"`
+	Remaining *int `json:"remaining,omitempty"`
+	Category string `json:"category,omitempty"`
+	Price *int `json:"price,omitempty"`
 }
 
 type UpdateProductResponse = Product

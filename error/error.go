@@ -29,25 +29,11 @@ func (e UserAlreadyExists) Error() string {
 	return "user with these credentials already exists"
 }
 
-type UserNotFound struct {
-	Name string `json:"name"`
-}
-func (e UserNotFound) Error() string {
-	return fmt.Sprintf("user with name %s is not found", e.Name)
-}
-
 type InvalidUserId struct {
 	ID string `json:"id"`
 }
 func (e InvalidUserId) Error() string {
 	return fmt.Sprintf("invalid user id: %s", e.ID)
-}
-
-type ProductNotFound struct {
-	ID int `json:"id"`
-}
-func (e ProductNotFound) Error() string {
-	return fmt.Sprintf("product with id %d not found", e.ID)
 }
 
 type DbTransactionFailed struct {
@@ -61,5 +47,19 @@ type InternalServerError struct {
 	Err string `json:"error"`
 }
 func (e InternalServerError) Error() string {
-	return fmt.Sprintf("%s", e.Err)
+	return e.Err
+}
+
+type DbRecordNotFound struct {
+	Err string `json:"error"`
+}
+func (e DbRecordNotFound) Error() string {
+	return e.Err
+}
+
+type InvalidInputError struct {
+	Err string `json:"error"`
+}
+func (e InvalidInputError) Error() string {
+	return e.Err
 }

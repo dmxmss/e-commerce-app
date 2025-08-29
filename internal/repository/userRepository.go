@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 
 	"errors"
+	"fmt"
 )
 
 type UserRepository interface {
@@ -58,7 +59,7 @@ func (u *userRepository) GetUserBy(request dto.GetUserBy) (*entities.User, error
 
 	if err := query.First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, e.UserNotFound{Name: request.Name}
+			return nil, e.DbRecordNotFound{Err: fmt.Sprintf("user with name %s not found", request.Name)}
 		} else {
 			return nil, e.DbTransactionFailed{Err: err}
 		}

@@ -79,9 +79,6 @@ func (s Server) Start() {
 }
 
 func (s Server) setUpRouter() { // routes, middleware
-	auth := s.echo.Group("/auth")
-	products := s.echo.Group("/products")
-
 	s.echo.HTTPErrorHandler = s.ErrorHandler
 
 	s.echo.Use(middleware.Recover())
@@ -97,12 +94,16 @@ func (s Server) setUpRouter() { // routes, middleware
 	accessMiddleware := GetAccessMiddleware(s.conf.Auth.JWTSecret, s.conf.Auth.SigningMethod)
 	refreshMiddleware := GetRefreshMiddleware(s.conf.Auth.JWTSecret, s.conf.Auth.SigningMethod)
 
+	auth := s.echo.Group("/auth")
+	products := s.echo.Group("/products")
+
 	auth.POST("/signup", s.SignUp)	
 	auth.POST("/login", s.LogIn)	
 	auth.POST("/refresh", s.RefreshTokens, refreshMiddleware)	
 
-	products.POST("/", s.CreateProduct)
-	products.DELETE("/{id}", s.DeleteProduct)
+	products.POST("/", s.CreateProduct, accessMiddleware)
+	products.GET("/", s.GetUserProducts, accessMiddleware)
+	products.DELETE("/{id}", s.DeleteProduct, accessMiddleware)
 
 	s.echo.GET("/me", s.GetUserInfo, accessMiddleware)
 }

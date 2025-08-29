@@ -7,9 +7,13 @@ import (
 type Product struct {
 	ID int `gorm:"primaryKey"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime"`
 	Name string `gorm:"not null"`
 	Description string
-	Vendor string
+	Vendor int
+	User User `gorm:"foreignKey:Vendor"`
+	Remaining int
 	Price int 
-	Tags string
+	CategoryID int
+	Category Category
 }
