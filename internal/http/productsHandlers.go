@@ -49,7 +49,7 @@ func (s Server) CreateProduct(c echo.Context) error {
 		Vendor: product.Vendor,
 		Remaining: product.Remaining,
 		Price: product.Price,
-		Category: product.Category.Name,
+		Category: product.CategoryID,
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -84,7 +84,7 @@ func (s Server) GetUserProducts(c echo.Context) error {
 				Vendor: product.Vendor,
 				Remaining: product.Remaining,
 				Price: product.Price,
-				Category: product.Category.Name,
+				Category: product.CategoryID,
 			},
 		)
 	}	

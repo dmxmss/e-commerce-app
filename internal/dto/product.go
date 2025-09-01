@@ -10,10 +10,10 @@ type Product struct {
 	UpdatedAt time.Time `json:"updatedTime"`
 	Name string `json:"name"`
 	Description string `json:"description"`
-	Vendor int `json:"vendor"`
+	Vendor int `json:"vendor_id"`
 	Remaining int `json:"remaining"`
 	Price int `json:"price"`
-	Category string `json:"category"`
+	Category int `json:"category_id"`
 }
 
 type CreateProductRequest struct {

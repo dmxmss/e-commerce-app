@@ -94,16 +94,18 @@ func (s Server) setUpRouter() { // routes, middleware
 	accessMiddleware := GetAccessMiddleware(s.conf.Auth.JWTSecret, s.conf.Auth.SigningMethod)
 	refreshMiddleware := GetRefreshMiddleware(s.conf.Auth.JWTSecret, s.conf.Auth.SigningMethod)
 
+	api := s.echo.Group("/api")
+
 	auth := s.echo.Group("/auth")
-	products := s.echo.Group("/products")
+	products := api.Group("/products", accessMiddleware)
 
 	auth.POST("/signup", s.SignUp)	
 	auth.POST("/login", s.LogIn)	
 	auth.POST("/refresh", s.RefreshTokens, refreshMiddleware)	
 
-	products.POST("/", s.CreateProduct, accessMiddleware)
-	products.GET("/", s.GetUserProducts, accessMiddleware)
-	products.DELETE("/{id}", s.DeleteProduct, accessMiddleware)
+	products.POST("/", s.CreateProduct)
+	products.GET("/", s.GetUserProducts)
+	products.DELETE("/{id}", s.DeleteProduct)
 
 	s.echo.GET("/me", s.GetUserInfo, accessMiddleware)
 }

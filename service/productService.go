@@ -5,8 +5,6 @@ import (
 	"github.com/dmxmss/e-commerce-app/internal/dto"
 	"github.com/dmxmss/e-commerce-app/internal/repository"
 	"gorm.io/gorm"
-
-	"fmt"
 )
 
 type ProductService interface {
@@ -62,7 +60,6 @@ func (s *productService) DeleteProduct(id int) error {
 }
 
 func (s *productService) GetUserProducts(id int) ([]entities.Product, error) {
-	fmt.Printf("aoirrntorie %v, %d", dto.GetProductsBy{Vendor: &id}, id)
 	products, err := s.repo.product.GetProductsBy(dto.GetProductsBy{Vendor: &id})
 	if err != nil {
 		return nil, err
