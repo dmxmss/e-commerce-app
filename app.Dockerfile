@@ -1,12 +1,13 @@
 FROM golang:1.24.2-alpine3.21 AS builder
 WORKDIR /usr/src/app
 
-COPY ./go.mod ./go.sum ./
+COPY ./backend/go.mod ./backend/go.sum ./
 
 RUN go mod download
 
-COPY config.yaml .
-COPY . .
+COPY ./backend/config.yaml .
+COPY main.go .
+COPY ./backend/ .
 
 RUN go build -o application .
 
@@ -16,6 +17,6 @@ WORKDIR /app
 COPY --from=builder /usr/src/app/config.yaml .
 COPY --from=builder /usr/src/app/application ./app
 
-EXPOSE 8000
+EXPOSE 8080
 
 CMD ["./app"]
