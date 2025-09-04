@@ -12,6 +12,7 @@ type (
 		App *App
 		Database *Database
 		Auth *Auth
+		Payment *Payment
 	}
 
 	App struct {
@@ -35,7 +36,11 @@ type (
 	}
 
 	Token struct {
-		Expiration int // seconds
+		Expiration int // in seconds
+	}
+
+	Payment struct {
+		Key string
 	}
 )
 
@@ -65,6 +70,8 @@ func GetConfig() *Config {
 		viper.SetDefault("auth.access.expiration", 60*60)
 		viper.SetDefault("auth.refresh.expiration", 60*60*24*7)
 		viper.SetDefault("auth.signingmethod", "HS256")
+
+		viper.SetDefault("payment.key", "")
 
 		if err := viper.ReadInConfig(); err != nil {
 			panic(err)

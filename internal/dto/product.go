@@ -31,10 +31,9 @@ type GetProductRequest struct {
 }
 
 type GetProductsBy struct {
-	ID *int `json:"id,omitempty"`
-	Name string `json:"name,omitempty"`
+	Names []string `json:"names,omitempty"`
 	Vendor *int `json:"vendor,omitempty"`
-	Category string `json:"category,omitempty"`
+	Categories []int `json:"categories,omitempty"`
 }
 
 type GetProductsResponse = []Product

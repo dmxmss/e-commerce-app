@@ -36,6 +36,13 @@ func (e InvalidUserId) Error() string {
 	return fmt.Sprintf("invalid user id: %s", e.ID)
 }
 
+type PaymentFailed struct {
+	Err string `json:"error"`
+}
+func (e PaymentFailed) Error() string {
+	return fmt.Sprintf("payment failed: %s", e.Err)
+}
+
 type DbTransactionFailed struct {
 	Err error
 }

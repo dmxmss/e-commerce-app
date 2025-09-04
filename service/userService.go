@@ -5,7 +5,6 @@ import (
 	e "github.com/dmxmss/e-commerce-app/error"
 	"github.com/dmxmss/e-commerce-app/entities"
 	"github.com/dmxmss/e-commerce-app/internal/repository"
-	"gorm.io/gorm"
 
 	"strconv"
 )
@@ -22,7 +21,7 @@ type userService struct {
 	repo userServiceRepo
 }
 
-func NewUserService(db *gorm.DB, userRepo repository.UserRepository) UserService {
+func NewUserService(userRepo repository.UserRepository) UserService {
 	return &userService{
 		repo: userServiceRepo{
 			user: userRepo,

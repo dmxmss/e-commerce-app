@@ -13,6 +13,7 @@ import (
 type ProductRepository interface {
 	CreateProduct(entities.Product) (*entities.Product, error)
 	GetProductsBy(dto.GetProductsBy) ([]entities.Product, error)
+	GetProducts([]int) ([]entities.Product, error)
 	DeleteProduct(entities.Product) error
 	GetCategoryByName(string) (*entities.Category, error)
 }
@@ -39,37 +40,42 @@ func (r *productRepository) GetProductsBy(request dto.GetProductsBy) ([]entities
 	var products []entities.Product
 	query := r.db.Model(&products)
 
-	if request.ID == nil && request.Name == "" && request.Vendor == nil && request.Category == "" {
+	if request.Names == nil && request.Vendor == nil && request.Categories == nil {
 		return nil, nil
 	}
 
-	if request.ID != nil {
-		query = query.Where("id = ?", request.ID)
-	}
-
-	if request.Name != "" {
-		query = query.Where("name = ?", request.Name)
+	if request.Names != nil {
+		query = query.Where("name IN ?", request.Names)
 	}
 
 	if request.Vendor != nil {
 		query = query.Where("vendor = ?", request.Vendor)
 	}
 
-	if request.Category != "" {
-		category, err := r.GetCategoryByName(request.Category)
-		if err != nil {
-			return nil, err
-		}
-
-		query = query.Where("category = ?", category.ID)
+	if request.Categories != nil {
+		query = query.Where("category = ?", request.Categories)
 	}
 
 	if err := query.Find(&products).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, e.DbRecordNotFound{Err: "no products found with this condition"}
-		} else {
-			return nil, e.DbTransactionFailed{Err: err}
-		}
+		return nil, e.DbTransactionFailed{Err: err}
+	}
+
+	if len(products) == 0 {
+		return nil, e.DbRecordNotFound{Err: "no records found with these conditions"}
+	}
+
+	return products, nil
+}
+
+func (r *productRepository) GetProducts(ids []int) ([]entities.Product, error) {
+	var products []entities.Product
+
+	if err := r.db.Where("id IN ?", ids).Find(&products).Error; err != nil {
+		return nil, e.DbTransactionFailed{Err: err}
+	}
+
+	if len(products) != len(ids) {
+		return nil, e.DbRecordNotFound{Err: "not all records with these ids are found"}
 	}
 
 	return products, nil

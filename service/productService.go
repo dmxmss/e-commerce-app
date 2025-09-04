@@ -4,7 +4,6 @@ import (
 	"github.com/dmxmss/e-commerce-app/entities"
 	"github.com/dmxmss/e-commerce-app/internal/dto"
 	"github.com/dmxmss/e-commerce-app/internal/repository"
-	"gorm.io/gorm"
 )
 
 type ProductService interface {
@@ -21,9 +20,7 @@ type productService struct {
 	repo productServiceRepo
 }
 
-func NewProductService(db *gorm.DB) ProductService {
-	productRepo := repository.NewProductRepository(db)
-
+func NewProductService(productRepo repository.ProductRepository) ProductService {
 	return &productService{
 		repo: productServiceRepo{
 			product: productRepo,
