@@ -102,7 +102,7 @@ func (s Server) setUpRouter() { // routes, middleware
 
 	api := s.echo.Group("/api")
 
-	auth := s.echo.Group("/auth")
+	auth := api.Group("/auth")
 	products := api.Group("/products", accessMiddleware)
 	payments := api.Group("/payments", accessMiddleware)
 
@@ -117,5 +117,5 @@ func (s Server) setUpRouter() { // routes, middleware
 	payments.POST("/", s.CreatePayment)
 	payments.GET("/:id", s.GetPayment)
 
-	s.echo.GET("/me", s.GetUserInfo, accessMiddleware)
+	api.GET("/me", s.GetUserInfo, accessMiddleware)
 }
