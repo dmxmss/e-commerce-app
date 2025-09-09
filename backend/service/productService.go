@@ -8,7 +8,9 @@ import (
 
 type ProductService interface {
 	CreateProduct(string, string, int, int, int, string) (*entities.Product, error)
-	GetUserProducts(int) ([]entities.Product, error)
+	GetProducts(dto.GetProductParams) ([]entities.Product, error)
+	GetProduct(int) (*entities.Product, error)
+	UpdateProduct(int, dto.UpdateProductRequest) (*entities.Product, error)
 	DeleteProduct(int) error
 }
 
@@ -48,19 +50,18 @@ func (s *productService) CreateProduct(name, description string, vendor, remaini
 	return response, err
 }
 
-func (s *productService) DeleteProduct(id int) error {
-	product := entities.Product{
-		ID: id,
-	}
-
-	return s.repo.product.DeleteProduct(product)
+func (s *productService) GetProducts(params dto.GetProductParams) ([]entities.Product, error) {
+	return s.repo.product.GetProducts(params)
 }
 
-func (s *productService) GetUserProducts(id int) ([]entities.Product, error) {
-	products, err := s.repo.product.GetProductsBy(dto.GetProductsBy{Vendor: &id})
-	if err != nil {
-		return nil, err
-	}
+func (s *productService) GetProduct(id int) (*entities.Product, error) {
+	return s.repo.product.GetProduct(id)
+}
 
-	return products, nil
+func (s *productService) UpdateProduct(id int, request dto.UpdateProductRequest) (*entities.Product, error) {
+	return s.repo.product.UpdateProduct(id, request)
+}
+
+func (s *productService) DeleteProduct(id int) error {
+	return s.repo.product.DeleteProduct(id)
 }

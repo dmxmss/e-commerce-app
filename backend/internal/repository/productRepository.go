@@ -2,19 +2,21 @@ package repository
 
 import (
 	"github.com/dmxmss/e-commerce-app/entities"
-	"github.com/dmxmss/e-commerce-app/internal/dto"
 	e "github.com/dmxmss/e-commerce-app/error"
+	"github.com/dmxmss/e-commerce-app/internal/dto"
 	"gorm.io/gorm"
-	
+	"gorm.io/gorm/clause"
+
 	"errors"
 	"fmt"
 )
 
 type ProductRepository interface {
 	CreateProduct(entities.Product) (*entities.Product, error)
-	GetProductsBy(dto.GetProductsBy) ([]entities.Product, error)
-	GetProducts([]int) ([]entities.Product, error)
-	DeleteProduct(entities.Product) error
+	GetProducts(dto.GetProductParams) ([]entities.Product, error)
+	GetProduct(int) (*entities.Product, error)
+	UpdateProduct(int, dto.UpdateProductRequest) (*entities.Product, error)
+	DeleteProduct(int) error
 	GetCategoryByName(string) (*entities.Category, error)
 }
 
@@ -36,52 +38,70 @@ func (r *productRepository) CreateProduct(product entities.Product) (*entities.P
 	return &product, nil
 }
 
-func (r *productRepository) GetProductsBy(request dto.GetProductsBy) ([]entities.Product, error) {
+func (r *productRepository) GetProduct(id int) (*entities.Product, error) {
+	var product entities.Product
+
+	if err := r.db.Where("id = ?", id).Take(&product).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, e.DbRecordNotFound{Err: fmt.Sprintf("not found product with id %d", id)}
+		} else {
+			return nil, e.DbTransactionFailed{Err: err}
+		}
+	}
+
+	return &product, nil
+}
+
+func (r *productRepository) GetProducts(params dto.GetProductParams) ([]entities.Product, error) {
 	var products []entities.Product
-	query := r.db.Model(&products)
 
-	if request.Names == nil && request.Vendor == nil && request.Categories == nil {
-		return nil, nil
+	q := r.db.Model(&entities.Product{})
+
+	if params.Target == "vendorId" && params.ID != 0 {
+		q = q.Where("vendor = ?", params.ID)
+	} else if params.IDs != nil {
+		q = q.Where("id IN ?", params.IDs)
+	} 
+
+	// TODO: add filtering by price, remaining, category, created and updated date
+	// TODO: add allowed sorting fields 
+
+	if params.SortField != "" && params.SortOrder != "" {
+		q = q.Order(params.SortField + " " + params.SortOrder)
 	}
 
-	if request.Names != nil {
-		query = query.Where("name IN ?", request.Names)
+	if params.Page != 0 && params.PerPage != 0 {
+		q = q.Limit(params.PerPage).Offset((params.Page - 1)*params.PerPage)
 	}
 
-	if request.Vendor != nil {
-		query = query.Where("vendor = ?", request.Vendor)
-	}
-
-	if request.Categories != nil {
-		query = query.Where("category = ?", request.Categories)
-	}
-
-	if err := query.Find(&products).Error; err != nil {
+	if err := q.Find(&products).Error; err != nil {
 		return nil, e.DbTransactionFailed{Err: err}
-	}
-
-	if len(products) == 0 {
-		return nil, e.DbRecordNotFound{Err: "no records found with these conditions"}
 	}
 
 	return products, nil
 }
 
-func (r *productRepository) GetProducts(ids []int) ([]entities.Product, error) {
-	var products []entities.Product
+func (r *productRepository) UpdateProduct(id int, request dto.UpdateProductRequest) (*entities.Product, error) {
+	var product entities.Product
 
-	if err := r.db.Where("id IN ?", ids).Find(&products).Error; err != nil {
+	if err := r.db.Model(&entities.Product{}).
+								 Clauses(clause.Returning{}).
+								 Where("id = ?", id).
+								 Updates(&request).
+								 Scan(&product).Error; err != nil {
 		return nil, e.DbTransactionFailed{Err: err}
 	}
 
-	if len(products) != len(ids) {
-		return nil, e.DbRecordNotFound{Err: "not all records with these ids are found"}
-	}
+	product.ID = id
 
-	return products, nil
+	return &product, nil
 }
 
-func (r *productRepository) DeleteProduct(product entities.Product) error {
+func (r *productRepository) DeleteProduct(id int) error {
+	product := entities.Product{
+		ID: id,
+	}
+
 	if err := r.db.Delete(&product).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return e.DbRecordNotFound{Err: fmt.Sprintf("product with id %d not found", product.ID)}

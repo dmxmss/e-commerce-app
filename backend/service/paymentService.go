@@ -4,6 +4,7 @@ import (
 	e "github.com/dmxmss/e-commerce-app/error"
 	"github.com/dmxmss/e-commerce-app/entities"
 	"github.com/dmxmss/e-commerce-app/internal/repository"
+	"github.com/dmxmss/e-commerce-app/internal/dto"
 
 	"context"
 	"fmt"
@@ -33,7 +34,7 @@ func NewPaymentService(paymentRepo repository.PaymentRepository, productRepo rep
 }
 
 func (s *stripeService) CreatePayment(ctx context.Context, productIds []int, currency string, metadata map[string]any) (*entities.Payment, error) {
-	products, err := s.repo.product.GetProducts(productIds)
+	products, err := s.repo.product.GetProducts(dto.GetProductParams{IDs: productIds})
 	if err != nil {
 		return nil, err
 	}

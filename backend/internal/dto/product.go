@@ -2,6 +2,7 @@ package dto
 
 import (
 	"time"
+	"net/url"
 )
 
 type Product struct {
@@ -30,24 +31,34 @@ type GetProductRequest struct {
 	ID *int `json:"id"`
 }
 
-type GetProductsBy struct {
-	Names []string `json:"names,omitempty"`
-	Vendor *int `json:"vendor,omitempty"`
-	Categories []int `json:"categories,omitempty"`
+type GetProductParams struct {
+	ID int `query:"id"`
+	IDs []int `query:"ids"`
+	Page int `query:"page"`
+	PerPage int `query:"perPage"`
+	SortField string `query:"sortField"`
+	SortOrder string `query:"sortOrder"`
+	Target string `query:"target"`
+	All url.Values `query:"-"`
 }
 
 type GetProductsResponse = []Product
 
 type UpdateProductRequest struct {
-	ID int `json:"id"`
 	Name string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
-	Remaining *int `json:"remaining,omitempty"`
-	Category string `json:"category,omitempty"`
-	Price *int `json:"price,omitempty"`
+	Remaining int `json:"remaining,omitempty"`
+	CategoryID int `json:"category_id,omitempty"`
+	Price int `json:"price,omitempty"`
 }
 
-type UpdateProductResponse = Product
+type UpdateProductResponse struct {
+	Name string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
+	Remaining int `json:"remaining,omitempty"`
+	CategoryID int `json:"category_id,omitempty"`
+	Price int `json:"price,omitempty"`
+}
 
 type DeleteProductRequest struct {
 	ID int `json:"id"`
