@@ -102,12 +102,13 @@ func (r *productRepository) DeleteProduct(id int) error {
 		ID: id,
 	}
 
-	if err := r.db.Delete(&product).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return e.DbRecordNotFound{Err: fmt.Sprintf("product with id %d not found", product.ID)}
-		} else {
-			return e.DbTransactionFailed{Err: err}
-		}
+	res := r.db.Delete(&product)
+	if res.Error != nil {
+		return e.DbTransactionFailed{Err: res.Error}
+	}
+
+	if res.RowsAffected == 0 {
+		return e.DbRecordNotFound{Err: "product not found"}
 	}
 
 	return nil

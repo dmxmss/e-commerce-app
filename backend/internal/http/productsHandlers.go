@@ -173,7 +173,7 @@ func (s Server) DeleteProduct(c echo.Context) error {
 		return e.InternalServerError{Err: "error id conversion"}
 	}
 
-	idStr := c.QueryParam("id")
+	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if len(idStr) == 0 || err != nil { 
 		return echo.ErrBadRequest
