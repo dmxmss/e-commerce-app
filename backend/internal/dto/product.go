@@ -7,8 +7,8 @@ import (
 
 type Product struct {
 	ID int `json:"id"`
-	CreatedAt time.Time `json:"createdTime"`
-	UpdatedAt time.Time `json:"updatedTime"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 	Name string `json:"name"`
 	Description string `json:"description"`
 	Vendor int `json:"vendor_id"`

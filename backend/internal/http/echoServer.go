@@ -87,6 +87,7 @@ func (s Server) Start() {
 func (s Server) setUpRouter() { // routes, middleware
 	s.echo.HTTPErrorHandler = s.ErrorHandler
 
+	s.echo.Pre(middleware.RemoveTrailingSlash())
 	s.echo.Use(middleware.Recover())
 	s.echo.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		LogStatus: true,
@@ -110,8 +111,8 @@ func (s Server) setUpRouter() { // routes, middleware
 	auth.POST("/login", s.LogIn)	
 	auth.POST("/refresh", s.RefreshTokens, refreshMiddleware)	
 
-	products.POST("/", s.CreateProduct, accessMiddleware)
-	products.GET("/", s.GetProducts)
+	products.POST("", s.CreateProduct, accessMiddleware)
+	products.GET("", s.GetProducts)
 	products.GET("/:id", s.GetProduct)
 	products.PUT("/:id", s.UpdateProduct, accessMiddleware)
 	products.DELETE("/:id", s.DeleteProduct, accessMiddleware)

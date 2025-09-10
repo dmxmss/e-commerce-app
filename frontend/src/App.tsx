@@ -1,11 +1,11 @@
-import { Admin, ListGuesser, Resource } from "react-admin";
+import { Admin, Resource } from "react-admin";
 import { Layout } from "./Layout";
-import simpleRestProvider from "ra-data-simple-rest";
+import dataProvider from "./dataProvider.ts";
+import ProductList from "./components/product/ProductList";
 
 const App = () => (
-  <Admin layout={Layout} dataProvider={simpleRestProvider("http://localhost:3000/api")} disableTelemetry>
-    <Resource name="products" list={ListGuesser} />
-    <Resource name="users" list={ListGuesser} />
+  <Admin layout={Layout} dataProvider={dataProvider} disableTelemetry>
+    <Resource name="products" list={ProductList} />
   </Admin>
 );
 
