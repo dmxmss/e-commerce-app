@@ -34,6 +34,7 @@ type Service struct {
 	user service.UserService
 	product service.ProductService
 	payment service.PaymentService
+	category service.CategoryService
 }
 
 func NewEchoServer(conf *config.Config, db *gorm.DB) (ServerInterface, error) {
@@ -44,6 +45,7 @@ func NewEchoServer(conf *config.Config, db *gorm.DB) (ServerInterface, error) {
 	}
 	productRepo := repository.NewProductRepository(db)
 	paymentRepo := repository.NewPaymentRepository(conf.Payment.Key)
+	categoryRepo := repository.NewCategoryRepository(db)
 
 	authService, err := service.NewAuthService(conf, authRepo, userRepo)
 	if err != nil {
@@ -54,6 +56,7 @@ func NewEchoServer(conf *config.Config, db *gorm.DB) (ServerInterface, error) {
 	productService := service.NewProductService(productRepo)
 
 	paymentService := service.NewPaymentService(paymentRepo, productRepo)
+	categoryService := service.NewCategoryService(categoryRepo)
 
 	echo := echo.New()
 
@@ -64,6 +67,7 @@ func NewEchoServer(conf *config.Config, db *gorm.DB) (ServerInterface, error) {
 			user: userService,
 			product: productService,
 			payment: paymentService,
+			category: categoryService,
 		},
 		conf,
 	}
@@ -106,6 +110,7 @@ func (s Server) setUpRouter() { // routes, middleware
 	auth := api.Group("/auth")
 	products := api.Group("/products")
 	payments := api.Group("/payments", accessMiddleware)
+	categories := api.Group("/categories")
 
 	auth.POST("/signup", s.SignUp)	
 	auth.POST("/login", s.LogIn)	
@@ -117,7 +122,10 @@ func (s Server) setUpRouter() { // routes, middleware
 	products.PUT("/:id", s.UpdateProduct, accessMiddleware)
 	products.DELETE("/:id", s.DeleteProduct, accessMiddleware)
 
-	payments.POST("/", s.CreatePayment)
+	categories.GET("/:id", s.GetCategory)
+	categories.GET("", s.GetCategories)
+
+	payments.POST("", s.CreatePayment)
 	payments.GET("/:id", s.GetPayment)
 
 	api.GET("/me", s.GetUserInfo, accessMiddleware)

@@ -23,11 +23,13 @@ const dataProvider: DataProvider = {
   },
 
   getOne: async (resource, params) => {
+    console.log("resource: ", resource, " params: ", params);
     const request = `${apiUrl}/${resource}/${params.id}`;
 
     const response = await fetch(request);
     const data = await response.json();
 
+    console.log("data:", data);
     return {
       data: data,
     };
@@ -46,7 +48,6 @@ const dataProvider: DataProvider = {
 
     return {
       data: data,
-      total: data.length,
     };
   },
 

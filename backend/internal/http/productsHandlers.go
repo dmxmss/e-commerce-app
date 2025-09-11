@@ -9,7 +9,6 @@ import (
 
 	"net/http"
 	"strconv"
-	"log"
 )
 
 func (s Server) CreateProduct(c echo.Context) error {
@@ -88,7 +87,6 @@ func (s Server) GetProducts(c echo.Context) error {
 
 	c.JSON(http.StatusOK, map[string]any {
 		"data": response,
-		"total": len(products),
 	})
 	return nil
 }
@@ -141,7 +139,6 @@ func (s Server) UpdateProduct(c echo.Context) error {
 	var request dto.UpdateProductRequest
 
 	if err := c.Bind(&request); err != nil {
-		log.Printf("%s", err)
 		return echo.ErrBadRequest
 	}
 
