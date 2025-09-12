@@ -44,7 +44,7 @@ func (e PaymentFailed) Error() string {
 }
 
 type DbTransactionFailed struct {
-	Err error
+	Err string
 }
 func (e DbTransactionFailed) Error() string {
 	return fmt.Sprintf("db transaction error: %s", e.Err)

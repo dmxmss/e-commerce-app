@@ -15,7 +15,9 @@ const ProductShow = () => (
       <DateField source="updated_at" />
       <TextField source="name" />
       <TextField source="description" />
-      <NumberField source="vendor_id" />
+      <ReferenceField source="vendor_id" reference="users">
+        <TextField source="name" />
+      </ReferenceField>
       <NumberField source="remaining" />
       <NumberField source="price" />
       <ReferenceField source="category_id" reference="categories" />

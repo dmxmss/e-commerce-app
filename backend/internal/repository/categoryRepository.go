@@ -31,7 +31,7 @@ func (r *categoryRepository) GetCategory(id int) (*entities.Category, error) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, e.DbRecordNotFound{Err: "category not found"}
 		} else {
-			return nil, e.DbTransactionFailed{Err: err}
+			return nil, e.DbTransactionFailed{Err: err.Error()}
 		}
 	}
 
@@ -48,7 +48,7 @@ func (r *categoryRepository) GetCategories(params dto.GetCategoriesParams) ([]en
 	}
 
 	if err := q.Find(&categories).Error; err != nil {
-		return nil, e.DbTransactionFailed{Err: err}
+		return nil, e.DbTransactionFailed{Err: err.Error()}
 	}
 
 	return categories, nil

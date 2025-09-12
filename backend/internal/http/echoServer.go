@@ -108,6 +108,7 @@ func (s Server) setUpRouter() { // routes, middleware
 	api := s.echo.Group("/api")
 
 	auth := api.Group("/auth")
+	users := api.Group("/users")
 	products := api.Group("/products")
 	payments := api.Group("/payments", accessMiddleware)
 	categories := api.Group("/categories")
@@ -115,6 +116,9 @@ func (s Server) setUpRouter() { // routes, middleware
 	auth.POST("/signup", s.SignUp)	
 	auth.POST("/login", s.LogIn)	
 	auth.POST("/refresh", s.RefreshTokens, refreshMiddleware)	
+
+	users.GET("", s.GetUsers)
+	users.GET("/:id", s.GetUser)
 
 	products.POST("", s.CreateProduct, accessMiddleware)
 	products.GET("", s.GetProducts)

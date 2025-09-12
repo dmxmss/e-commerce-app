@@ -12,7 +12,8 @@ import (
 
 type UserRepository interface {
 	CreateUser(user entities.User) (*entities.User, error)
-	GetUserBy(dto.GetUserBy) (*entities.User, error)
+	GetUser(int) (*entities.User, error)
+	GetUsers(dto.GetUsersParams) ([]entities.User, error)
 }
 
 type userRepository struct {
@@ -30,40 +31,54 @@ func (u *userRepository) CreateUser(user entities.User) (*entities.User, error) 
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
 			return nil, e.UserAlreadyExists{}
 		} else {
-			return nil, e.DbTransactionFailed{Err: err}
+			return nil, e.DbTransactionFailed{Err: err.Error()}
 		}
 	}
 
 	return &user, nil
 }
 
-func (u *userRepository) GetUserBy(request dto.GetUserBy) (*entities.User, error) { // only one field in request must be non nil
-	var user entities.User	
-	query := u.db.Model(&user)
+func (r *userRepository) GetUser(id int) (*entities.User, error) {
+	var user entities.User
 
-	if request.Name == "" && request.Email == "" && request.ID == nil {
-		return nil, nil
-	}
-
-	if request.Name != "" {
-		query = query.Where("name = ?", request.Name)		
-	}
-
-	if request.Email != "" {
-		query = query.Where("email = ?", request.Email)		
-	}
-
-	if request.ID != nil {
-		query = query.Where("id = ?", request.ID)
-	}
-
-	if err := query.First(&user).Error; err != nil {
+	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, e.DbRecordNotFound{Err: fmt.Sprintf("user with name %s not found", request.Name)}
+			return nil, e.DbRecordNotFound{Err: fmt.Sprintf("user with id %d not found", id)}
 		} else {
-			return nil, e.DbTransactionFailed{Err: err}
+			return nil, e.DbTransactionFailed{Err: err.Error()}
 		}
 	}
 
 	return &user, nil
+}
+
+func (r *userRepository) GetUsers(params dto.GetUsersParams) ([]entities.User, error) {
+	var users []entities.User	
+	q:= r.db.Model(&entities.User{})
+
+	if params.IDs != nil {
+		q = q.Where("id IN ?", params.IDs)
+	}
+
+	if params.Name != "" {
+		q = q.Where("name = ?", params.Name)
+	}
+	
+	if params.Email != "" {
+		q = q.Where("email = ?", params.Email)
+	}
+
+	if params.SortField != "" && params.SortOrder != "" {
+		q = q.Order(params.SortField + " " + params.SortOrder)
+	}
+
+	if params.Page != 0 && params.PerPage != 0 {
+		q = q.Limit(params.PerPage).Offset((params.Page - 1)*params.PerPage)
+	}
+
+	if err := q.Find(&users).Error; err != nil {
+		return nil, e.DbTransactionFailed{Err: err.Error()}
+	}
+
+	return users, nil
 }

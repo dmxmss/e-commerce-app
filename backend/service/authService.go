@@ -64,10 +64,16 @@ func (s *authService) SignUp(name, email, password string) (*entities.User, stri
 }
 
 func (s *authService) Login(name, password string) (*entities.User, string, string, error) {
-	user, err := s.repo.user.GetUserBy(dto.GetUserBy{Name: name})
+	users, err := s.repo.user.GetUsers(dto.GetUsersParams{Name: name})
 	if err != nil {
 		return nil, "", "", err
 	}
+
+	if len(users) != 1 {
+		return nil, "", "", e.InternalServerError{Err: "auth service: login: len(users) != 1"}
+	}
+
+	user := users[0]
 
 	if user.Password != password {
 		return nil, "", "", e.InvalidCredentials{}
@@ -78,7 +84,7 @@ func (s *authService) Login(name, password string) (*entities.User, string, stri
 		return nil, "", "", err
 	}
 
-	return user, accessToken, refreshToken, nil
+	return &user, accessToken, refreshToken, nil
 }
 
 func (s *authService) GenerateTokens(isAdmin bool, subject string) (string, string, error) {

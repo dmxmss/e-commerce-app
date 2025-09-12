@@ -1,5 +1,15 @@
 package dto
 
+import (
+	"net/url"
+)
+
+type User struct {
+	ID int `json:"id"`
+	Name string `json:"name"`
+	Email string `json:"email"`
+}
+
 type CreateUserRequest struct {
 	Name string `json:"name"`
 	Email string `json:"email"`
@@ -11,26 +21,17 @@ type CreateUserResponse struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
-type LoginRequest struct {
-	Name string `json:"name"`
-	Email string `json:"email"`
-	Password string `json:"password"`
+type GetUsersParams struct {
+	IDs []int `query:"ids"`
+	Name string `query:"name"`
+	Email string `query:"email"`
+	Page int `query:"page"`
+	PerPage int `query:"perPage"`
+	SortField string `query:"sortField"`
+	SortOrder string `query:"sortOrder"`
+	All url.Values `query:"-"`
 }
 
-type LoginResponse struct {
-	AccessToken string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-}
+type GetUsersResponse = []User
 
-type GetUserBy struct { // only one field must be non nil
-	ID *int `json:"id,omitempty"`
-	Name string `json:"name,omitempty"`
-	Email string `json:"email,omitempty"`
-}
-
-type GetUserResponse struct {
-	ID int `json:"id"`
-	Name string `json:"name"`
-	Email string `json:"email"`
-	Admin bool `json:"admin"`
-}
+type GetUserResponse = User

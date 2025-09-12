@@ -32,7 +32,7 @@ func NewProductRepository(db *gorm.DB) ProductRepository {
 
 func (r *productRepository) CreateProduct(product entities.Product) (*entities.Product, error) {
 	if err := r.db.Create(&product).Error; err != nil {
-		return nil, e.DbTransactionFailed{Err: errors.New("failed to create a product")}
+		return nil, e.DbTransactionFailed{Err: "failed to create a product"}
 	}
 
 	return &product, nil
@@ -45,7 +45,7 @@ func (r *productRepository) GetProduct(id int) (*entities.Product, error) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, e.DbRecordNotFound{Err: fmt.Sprintf("not found product with id %d", id)}
 		} else {
-			return nil, e.DbTransactionFailed{Err: err}
+			return nil, e.DbTransactionFailed{Err: err.Error()}
 		}
 	}
 
@@ -75,7 +75,7 @@ func (r *productRepository) GetProducts(params dto.GetProductParams) ([]entities
 	}
 
 	if err := q.Find(&products).Error; err != nil {
-		return nil, e.DbTransactionFailed{Err: err}
+		return nil, e.DbTransactionFailed{Err: err.Error()}
 	}
 
 	return products, nil
@@ -89,7 +89,7 @@ func (r *productRepository) UpdateProduct(id int, request dto.UpdateProductReque
 								 Where("id = ?", id).
 								 Updates(&request).
 								 Scan(&product).Error; err != nil {
-		return nil, e.DbTransactionFailed{Err: err}
+		return nil, e.DbTransactionFailed{Err: err.Error()}
 	}
 
 	product.ID = id
@@ -103,8 +103,9 @@ func (r *productRepository) DeleteProduct(id int) error {
 	}
 
 	res := r.db.Delete(&product)
-	if res.Error != nil {
-		return e.DbTransactionFailed{Err: res.Error}
+	err := res.Error
+	if err != nil {
+		return e.DbTransactionFailed{Err: err.Error()}
 	}
 
 	if res.RowsAffected == 0 {
@@ -125,7 +126,7 @@ func (r *productRepository) GetCategoryByName(name string) (*entities.Category, 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, e.DbRecordNotFound{Err: fmt.Sprintf("category with name '%s' not found", name)}
 		} else {
-			return nil, e.DbTransactionFailed{Err: err}
+			return nil, e.DbTransactionFailed{Err: err.Error()}
 		}
 	}
 

@@ -11,6 +11,8 @@ import (
 
 type UserService interface {
 	GetUserInfo(string) (*entities.User, error)
+	GetUsers(dto.GetUsersParams) ([]entities.User, error)
+	GetUser(int) (*entities.User, error)
 }
 
 type userServiceRepo struct { // repositories user service needs
@@ -35,10 +37,18 @@ func (s *userService) GetUserInfo(userId string) (*entities.User, error) {
 		return nil, e.InvalidUserId{ID: userId}
 	}
 
-	user, err := s.repo.user.GetUserBy(dto.GetUserBy{ID: &id})
+	user, err := s.repo.user.GetUser(id)
 	if err != nil {
 		return nil, err
 	}
 
 	return user, nil
+}
+
+func (s *userService) GetUsers(params dto.GetUsersParams) ([]entities.User, error) {
+	return s.repo.user.GetUsers(params)
+}
+
+func (s *userService) GetUser(id int) (*entities.User, error) {
+	return s.repo.user.GetUser(id)
 }
