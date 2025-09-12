@@ -18,9 +18,7 @@ const ProductShow = () => (
       <NumberField source="vendor_id" />
       <NumberField source="remaining" />
       <NumberField source="price" />
-      <ReferenceField source="category_id" reference="categories">
-        <TextField source="name" />
-      </ReferenceField>
+      <ReferenceField source="category_id" reference="categories" />
     </SimpleShowLayout>
   </Show>
 );

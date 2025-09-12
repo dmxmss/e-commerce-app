@@ -15,10 +15,17 @@ const dataProvider: DataProvider = {
     }
 
     const response = await fetch(request);
-    const json = await response.json();
+    const data = await response.json();
+
+    const r = {
+      data: data,
+      total: data.length,
+    };
+    console.log(r);
+
     return {
-      data: json.data,
-      total: json.total,
+      data: data,
+      total: data.length,
     };
   },
 

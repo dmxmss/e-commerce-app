@@ -85,9 +85,7 @@ func (s Server) GetProducts(c echo.Context) error {
 		})
 	}
 
-	c.JSON(http.StatusOK, map[string]any {
-		"data": response,
-	})
+	c.JSON(http.StatusOK, response)
 	return nil
 }
 
