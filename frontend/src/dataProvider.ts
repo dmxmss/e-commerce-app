@@ -21,7 +21,6 @@ const dataProvider: DataProvider = {
       data: data,
       total: data.length,
     };
-    console.log(r);
 
     return {
       data: data,
@@ -30,13 +29,11 @@ const dataProvider: DataProvider = {
   },
 
   getOne: async (resource, params) => {
-    console.log("resource: ", resource, " params: ", params);
     const request = `${apiUrl}/${resource}/${params.id}`;
 
     const response = await fetch(request);
     const data = await response.json();
 
-    console.log("data:", data);
     return {
       data: data,
     };
@@ -44,7 +41,7 @@ const dataProvider: DataProvider = {
 
   getMany: async (resource, params) => {
     let ids = "";
-    for (id of params.ids) {
+    for (let id of params.ids) {
       ids += `ids=${id}&`;
     }
 
