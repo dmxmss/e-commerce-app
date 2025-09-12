@@ -53,7 +53,7 @@ func NewEchoServer(conf *config.Config, db *gorm.DB) (ServerInterface, error) {
 	}
 
 	userService := service.NewUserService(userRepo)
-	productService := service.NewProductService(productRepo)
+	productService := service.NewProductService(productRepo, categoryRepo)
 
 	paymentService := service.NewPaymentService(paymentRepo, productRepo)
 	categoryService := service.NewCategoryService(categoryRepo)

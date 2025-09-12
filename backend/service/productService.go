@@ -7,8 +7,8 @@ import (
 )
 
 type ProductService interface {
-	CreateProduct(string, string, int, int, int, string) (*entities.Product, error)
-	GetProducts(dto.GetProductParams) ([]entities.Product, error)
+	CreateProduct(string, string, int, int, int, int) (*entities.Product, error)
+	GetProducts(dto.GetProductParams) ([]entities.Product, int64, error)
 	GetProduct(int) (*entities.Product, error)
 	UpdateProduct(int, dto.UpdateProductRequest) (*entities.Product, error)
 	DeleteProduct(int) error
@@ -16,22 +16,24 @@ type ProductService interface {
 
 type productServiceRepo struct { // repositories product service needs
 	product repository.ProductRepository
+	category repository.CategoryRepository
 }
 
 type productService struct {
 	repo productServiceRepo
 }
 
-func NewProductService(productRepo repository.ProductRepository) ProductService {
+func NewProductService(productRepo repository.ProductRepository, categoryRepo repository.CategoryRepository) ProductService {
 	return &productService{
 		repo: productServiceRepo{
 			product: productRepo,
+			category: categoryRepo,
 		},
 	}
 }
 
-func (s *productService) CreateProduct(name, description string, vendor, remaining, price int, categoryName string) (*entities.Product, error) {
-	category, err := s.repo.product.GetCategoryByName(categoryName)
+func (s *productService) CreateProduct(name, description string, vendor, remaining, price int, categoryId int) (*entities.Product, error) {
+	category, err := s.repo.category.GetCategory(categoryId)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +52,7 @@ func (s *productService) CreateProduct(name, description string, vendor, remaini
 	return response, err
 }
 
-func (s *productService) GetProducts(params dto.GetProductParams) ([]entities.Product, error) {
+func (s *productService) GetProducts(params dto.GetProductParams) ([]entities.Product, int64, error) {
 	return s.repo.product.GetProducts(params)
 }
 

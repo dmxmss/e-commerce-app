@@ -36,7 +36,7 @@ func (s Server) GetCategories(c echo.Context) error {
 
 	params.All = c.QueryParams()
 
-	categories, err := s.service.category.GetCategories(params)
+	categories, total, err := s.service.category.GetCategories(params)
 	if err != nil {
 		return err
 	}
@@ -44,11 +44,13 @@ func (s Server) GetCategories(c echo.Context) error {
 	var response dto.GetCategoriesResponse
 		
 	for _, category := range categories {
-		response = append(response, dto.Category{
+		response.Data = append(response.Data, dto.Category{
 			ID: category.ID,
 			Name: category.Name,
 		})
 	}
+
+	response.Total = total
 
 	c.JSON(http.StatusOK, response)
 	return nil

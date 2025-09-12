@@ -34,7 +34,7 @@ func NewPaymentService(paymentRepo repository.PaymentRepository, productRepo rep
 }
 
 func (s *stripeService) CreatePayment(ctx context.Context, productIds []int, currency string, metadata map[string]any) (*entities.Payment, error) {
-	products, err := s.repo.product.GetProducts(dto.GetProductParams{IDs: productIds})
+	products, _, err := s.repo.product.GetProducts(dto.GetProductParams{IDs: productIds})
 	if err != nil {
 		return nil, err
 	}

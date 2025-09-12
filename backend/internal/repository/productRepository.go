@@ -13,11 +13,10 @@ import (
 
 type ProductRepository interface {
 	CreateProduct(entities.Product) (*entities.Product, error)
-	GetProducts(dto.GetProductParams) ([]entities.Product, error)
+	GetProducts(dto.GetProductParams) ([]entities.Product, int64, error)
 	GetProduct(int) (*entities.Product, error)
 	UpdateProduct(int, dto.UpdateProductRequest) (*entities.Product, error)
 	DeleteProduct(int) error
-	GetCategoryByName(string) (*entities.Category, error)
 }
 
 type productRepository struct {
@@ -52,8 +51,9 @@ func (r *productRepository) GetProduct(id int) (*entities.Product, error) {
 	return &product, nil
 }
 
-func (r *productRepository) GetProducts(params dto.GetProductParams) ([]entities.Product, error) {
+func (r *productRepository) GetProducts(params dto.GetProductParams) ([]entities.Product, int64, error) {
 	var products []entities.Product
+	var total int64
 
 	q := r.db.Model(&entities.Product{})
 
@@ -70,15 +70,19 @@ func (r *productRepository) GetProducts(params dto.GetProductParams) ([]entities
 		q = q.Order(params.SortField + " " + params.SortOrder)
 	}
 
+	if err := q.Count(&total).Error; err != nil {
+		return nil, 0, e.DbTransactionFailed{Err: err.Error()}
+	}
+
 	if params.Page != 0 && params.PerPage != 0 {
 		q = q.Limit(params.PerPage).Offset((params.Page - 1)*params.PerPage)
 	}
 
 	if err := q.Find(&products).Error; err != nil {
-		return nil, e.DbTransactionFailed{Err: err.Error()}
+		return nil, 0, e.DbTransactionFailed{Err: err.Error()}
 	}
 
-	return products, nil
+	return products, total, nil
 }
 
 func (r *productRepository) UpdateProduct(id int, request dto.UpdateProductRequest) (*entities.Product, error) {
@@ -113,22 +117,4 @@ func (r *productRepository) DeleteProduct(id int) error {
 	}
 
 	return nil
-}
-
-func (r *productRepository) GetCategoryByName(name string) (*entities.Category, error) {
-	if name == "" {
-		return nil, e.InvalidInputError{Err: "category name is empty"}
-	}
-
-	var category entities.Category
-
-	if err := r.db.Where("name = ?", name).First(&category).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, e.DbRecordNotFound{Err: fmt.Sprintf("category with name '%s' not found", name)}
-		} else {
-			return nil, e.DbTransactionFailed{Err: err.Error()}
-		}
-	}
-
-	return &category, nil
 }

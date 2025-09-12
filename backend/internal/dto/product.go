@@ -22,7 +22,7 @@ type CreateProductRequest struct {
 	Description string `json:"description,omitempty"`
 	Remaining int `json:"remaining"`
 	Price int `json:"price"`
-	Category string `json:"category"`
+	Category int `json:"category_id"`
 }
 
 type CreateProductResponse = Product
@@ -42,7 +42,10 @@ type GetProductParams struct {
 	All url.Values `query:"-"`
 }
 
-type GetProductsResponse = []Product
+type GetProductsResponse struct {
+	Data []Product `json:"data"`
+	Total int64 `json:"total"`
+}
 
 type UpdateProductRequest struct {
 	Name string `json:"name,omitempty"`

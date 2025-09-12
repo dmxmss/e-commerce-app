@@ -13,7 +13,7 @@ import (
 type UserRepository interface {
 	CreateUser(user entities.User) (*entities.User, error)
 	GetUser(int) (*entities.User, error)
-	GetUsers(dto.GetUsersParams) ([]entities.User, error)
+	GetUsers(dto.GetUsersParams) ([]entities.User, int64, error)
 }
 
 type userRepository struct {
@@ -52,8 +52,9 @@ func (r *userRepository) GetUser(id int) (*entities.User, error) {
 	return &user, nil
 }
 
-func (r *userRepository) GetUsers(params dto.GetUsersParams) ([]entities.User, error) {
+func (r *userRepository) GetUsers(params dto.GetUsersParams) ([]entities.User, int64, error) {
 	var users []entities.User	
+	var total int64
 	q:= r.db.Model(&entities.User{})
 
 	if params.IDs != nil {
@@ -72,13 +73,17 @@ func (r *userRepository) GetUsers(params dto.GetUsersParams) ([]entities.User, e
 		q = q.Order(params.SortField + " " + params.SortOrder)
 	}
 
+	if err := q.Count(&total).Error; err != nil {
+		return nil, 0, e.DbTransactionFailed{Err: err.Error()}
+	}
+
 	if params.Page != 0 && params.PerPage != 0 {
 		q = q.Limit(params.PerPage).Offset((params.Page - 1)*params.PerPage)
 	}
 
 	if err := q.Find(&users).Error; err != nil {
-		return nil, e.DbTransactionFailed{Err: err.Error()}
+		return nil, 0, e.DbTransactionFailed{Err: err.Error()}
 	}
 
-	return users, nil
+	return users, total, nil
 }

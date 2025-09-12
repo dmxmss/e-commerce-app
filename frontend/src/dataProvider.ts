@@ -17,14 +17,9 @@ const dataProvider: DataProvider = {
     const response = await fetch(request);
     const data = await response.json();
 
-    const r = {
-      data: data,
-      total: data.length,
-    };
-
     return {
-      data: data,
-      total: data.length,
+      data: data.data,
+      total: data.total,
     };
   },
 

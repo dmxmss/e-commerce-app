@@ -42,7 +42,7 @@ func (s Server) GetUsers(c echo.Context) error {
 
 	params.All = c.QueryParams()
 
-	users, err := s.service.user.GetUsers(params)
+	users, total, err := s.service.user.GetUsers(params)
 	if err != nil {
 		return err
 	}
@@ -50,12 +50,14 @@ func (s Server) GetUsers(c echo.Context) error {
 	var response dto.GetUsersResponse
 
 	for _, user := range users {
-		response = append(response, dto.User{
+		response.Data = append(response.Data, dto.User{
 			ID: user.ID,
 			Name: user.Name,
 			Email: user.Email,
 		})
 	}
+
+	response.Total = total;
 
 	c.JSON(http.StatusOK, response)
 	return nil
@@ -64,12 +66,13 @@ func (s Server) GetUsers(c echo.Context) error {
 func (s Server) GetUserInfo(c echo.Context) error {
 	token := c.Get("user").(*jwt.Token)
 	claims, ok := token.Claims.(*entities.Claims)
+	id, err := strconv.Atoi(claims.Subject)
 
-	if !ok {
+	if !ok || err != nil {
 		return e.InternalServerError{Err: "error retrieving claims from context"}
 	}
 
-	user, err := s.service.user.GetUserInfo(claims.Subject)
+	user, err := s.service.user.GetUser(id)
 	if err != nil {
 		return err
 	}

@@ -32,6 +32,9 @@ type GetUsersParams struct {
 	All url.Values `query:"-"`
 }
 
-type GetUsersResponse = []User
+type GetUsersResponse struct {
+	Data []User `json:"data"`
+	Total int64 `json:"total"`
+}
 
 type GetUserResponse = User

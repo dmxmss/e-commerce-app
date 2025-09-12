@@ -64,13 +64,13 @@ func (s *authService) SignUp(name, email, password string) (*entities.User, stri
 }
 
 func (s *authService) Login(name, password string) (*entities.User, string, string, error) {
-	users, err := s.repo.user.GetUsers(dto.GetUsersParams{Name: name})
+	users, total, err := s.repo.user.GetUsers(dto.GetUsersParams{Name: name})
 	if err != nil {
 		return nil, "", "", err
 	}
 
-	if len(users) != 1 {
-		return nil, "", "", e.InternalServerError{Err: "auth service: login: len(users) != 1"}
+	if total != 1 {
+		return nil, "", "", e.InternalServerError{Err: "auth service: login: total != 1"}
 	}
 
 	user := users[0]

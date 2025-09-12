@@ -65,14 +65,14 @@ func (s Server) GetProducts(c echo.Context) error {
 
 	params.All = c.QueryParams()
 
-	products, err := s.service.product.GetProducts(params)
+	products, total, err := s.service.product.GetProducts(params)
 	if err != nil {
 		return err
 	}
 
 	var response dto.GetProductsResponse
 	for _, product := range products {
-		response = append(response, dto.Product{
+		response.Data = append(response.Data, dto.Product{
 			ID: product.ID,
 			CreatedAt: product.CreatedAt, 
 			UpdatedAt: product.UpdatedAt,
@@ -84,6 +84,8 @@ func (s Server) GetProducts(c echo.Context) error {
 			Category: product.CategoryID,
 		})
 	}
+
+	response.Total = total
 
 	c.JSON(http.StatusOK, response)
 	return nil
