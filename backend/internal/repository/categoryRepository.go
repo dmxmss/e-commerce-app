@@ -43,11 +43,11 @@ func (r *categoryRepository) GetCategories(params dto.GetCategoriesParams) ([]en
 
 	q := r.db.Model(&entities.Category{})
 
-	if params.IDs == nil {
-		return nil, nil
+	if params.IDs != nil {
+		q = q.Where("id IN ?", params.IDs)
 	}
 
-	if err := q.Where("id IN ?", params.IDs).Find(&categories).Error; err != nil {
+	if err := q.Find(&categories).Error; err != nil {
 		return nil, e.DbTransactionFailed{Err: err}
 	}
 

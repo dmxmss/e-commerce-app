@@ -9,16 +9,30 @@ services:
     environment:
       DATABASE_PASSWORD: mypassword
       PAYMENT_KEY: ${STRIPE_API_KEY}
-    profiles: [dev, prod]
-  frontend:
+  frontend_dev:
     build:
       dockerfile: frontend.Dockerfile
-      target: ${FRONTEND_TARGET:-dev}
+      target: dev
     depends_on:
       - backend
     ports:
-      - "3000:${FRONTEND_PORT:-5173}"
-    profiles: [dev, prod]
+      - "3000:5173"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    profiles: [dev]
+  frontend_prod:
+    build:
+      dockerfile: frontend.Dockerfile
+      target: prod
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    profiles: [prod]
   db:
     image: postgres:17.4-alpine3.21
     environment:
