@@ -8,7 +8,7 @@ import (
 )
 
 type AuthRepository interface {
-	GenerateAndSignToken(entities.Claims) (string, error)
+	GenerateAndSignToken(entities.Claims) (*entities.AuthToken, error)
 }
 
 type authRepository struct {
@@ -41,12 +41,17 @@ func (r *authRepository) signToken(token *jwt.Token) (string, error) {
 	return signedToken, nil
 }
 
-func (r *authRepository) GenerateAndSignToken(claims entities.Claims) (string, error) {
-	token := jwt.NewWithClaims(r.method, claims)	
-	signedToken, err := r.signToken(token)
+func (r *authRepository) GenerateAndSignToken(claims entities.Claims) (*entities.AuthToken, error) {
+	rawToken := jwt.NewWithClaims(r.method, claims)	
+	signedToken, err := r.signToken(rawToken)
 	if err != nil {
-		return "", err
+		return nil, err
+	}
+	
+	token := entities.AuthToken{
+		Value: signedToken,
+		Claims: claims,
 	}
 
-	return signedToken, nil
+	return &token, nil
 }

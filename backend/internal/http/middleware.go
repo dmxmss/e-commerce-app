@@ -10,7 +10,7 @@ import (
 func GetAccessMiddleware(signingKey string, signingMethod string) echo.MiddlewareFunc {
 	accessMiddleware := echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(signingKey),
-		TokenLookup: "header:Authorization:Bearer ",
+		TokenLookup: "cookie:access_token",
 		ContextKey: "user",
 		SigningMethod: signingMethod,
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {

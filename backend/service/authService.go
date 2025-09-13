@@ -13,9 +13,9 @@ import (
 )
 
 type AuthService interface {
-	SignUp(name, email, password string) (*entities.User, string, string, error)
-	Login(name, password string) (*entities.User, string, string, error)
-	GenerateTokens(bool, string) (string, string, error)
+	SignUp(name, email, password string) (*entities.User, *entities.AuthToken, *entities.AuthToken, error)
+	Login(name, password string) (*entities.User, *entities.AuthToken, *entities.AuthToken, error)
+	GenerateTokens(bool, string) (*entities.AuthToken, *entities.AuthToken, error)
 }
 
 type authServiceRepo struct { // repositories auth service needs
@@ -43,7 +43,7 @@ func NewAuthService(
 	}, nil
 }
 
-func (s *authService) SignUp(name, email, password string) (*entities.User, string, string, error) {
+func (s *authService) SignUp(name, email, password string) (*entities.User, *entities.AuthToken, *entities.AuthToken, error) {
 	request := entities.User{
 		Name: name,
 		Email: email, 
@@ -52,42 +52,42 @@ func (s *authService) SignUp(name, email, password string) (*entities.User, stri
 
 	user, err := s.repo.user.CreateUser(request)
 	if err != nil {
-		return nil, "", "", err
+		return nil, nil, nil, err
 	}
 
 	accessToken, refreshToken, err := s.GenerateTokens(false, strconv.Itoa(user.ID))
 	if err != nil {
-		return nil, "", "", err
+		return nil, nil, nil, err
 	}
 
 	return user, accessToken, refreshToken, nil
 }
 
-func (s *authService) Login(name, password string) (*entities.User, string, string, error) {
+func (s *authService) Login(name, password string) (*entities.User, *entities.AuthToken, *entities.AuthToken, error) {
 	users, total, err := s.repo.user.GetUsers(dto.GetUsersParams{Name: name})
 	if err != nil {
-		return nil, "", "", err
+		return nil, nil, nil, err
 	}
 
 	if total != 1 {
-		return nil, "", "", e.InternalServerError{Err: "auth service: login: total != 1"}
+		return nil, nil, nil, e.InternalServerError{Err: "auth service: login: total != 1"}
 	}
 
 	user := users[0]
 
 	if user.Password != password {
-		return nil, "", "", e.InvalidCredentials{}
+		return nil, nil, nil, e.InvalidCredentials{}
 	}
 
 	accessToken, refreshToken, err := s.GenerateTokens(false, strconv.Itoa(user.ID))
 	if err != nil {
-		return nil, "", "", err
+		return nil, nil, nil, err
 	}
 
 	return &user, accessToken, refreshToken, nil
 }
 
-func (s *authService) GenerateTokens(isAdmin bool, subject string) (string, string, error) {
+func (s *authService) GenerateTokens(isAdmin bool, subject string) (*entities.AuthToken, *entities.AuthToken, error) {
 	accessTokenClaims := entities.Claims {
 		Admin: isAdmin,
 		RegisteredClaims: jwt.RegisteredClaims {
@@ -98,7 +98,7 @@ func (s *authService) GenerateTokens(isAdmin bool, subject string) (string, stri
 
 	accessToken, err := s.repo.auth.GenerateAndSignToken(accessTokenClaims)
 	if err != nil {
-		return "", "", err
+		return nil, nil, err
 	}
 
 	refreshTokenClaims := entities.Claims {
@@ -111,7 +111,7 @@ func (s *authService) GenerateTokens(isAdmin bool, subject string) (string, stri
 
 	refreshToken, err := s.repo.auth.GenerateAndSignToken(refreshTokenClaims)
 	if err != nil {
-		return "", "", err
+		return nil, nil, err
 	}
 	
 	return accessToken, refreshToken, nil
