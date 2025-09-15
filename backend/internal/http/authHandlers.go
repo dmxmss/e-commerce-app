@@ -17,18 +17,25 @@ func (s Server) SignUp(c echo.Context) error {
 		return err
 	}
 
-	_, accessToken, refreshToken, err := s.service.auth.SignUp(request.Name, request.Email, request.Password)
+	user, accessToken, refreshToken, err := s.service.auth.SignUp(request.Name, request.Email, request.Password)
 	if err != nil {
 		return err
 	}
 
-	accessCookie := setCookieFromToken("access_token", "/", s.conf.Auth.Access.Expiration, *accessToken)
-	refreshCookie := setCookieFromToken("refresh_token", "/", s.conf.Auth.Refresh.Expiration, *refreshToken)
+	accessCookie := setCookie("access_token", "/", s.conf.Auth.Access.Expiration, accessToken.Value)
+	refreshCookie := setCookie("refresh_token", "/", s.conf.Auth.Refresh.Expiration, refreshToken.Value)
 
 	c.SetCookie(accessCookie)
 	c.SetCookie(refreshCookie)
 
-	return c.JSON(http.StatusOK, nil)
+	response := dto.LoginResponse{
+		ID: user.ID,
+		Name: user.Name,
+		Email: user.Email,
+		Admin: user.Admin,
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
 func (s Server) LogIn(c echo.Context) error {
@@ -38,18 +45,35 @@ func (s Server) LogIn(c echo.Context) error {
 		return err
 	}
 
-	_, accessToken, refreshToken, err := s.service.auth.Login(request.Name, request.Password)
+	user, accessToken, refreshToken, err := s.service.auth.Login(request.Name, request.Password)
 	if err != nil {
 		return err
 	}
 
-	accessCookie := setCookieFromToken("access_token", "/", s.conf.Auth.Access.Expiration, *accessToken)
-	refreshCookie := setCookieFromToken("refresh_token", "/", s.conf.Auth.Refresh.Expiration, *refreshToken)
+	accessCookie := setCookie("access_token", "/", s.conf.Auth.Access.Expiration, accessToken.Value)
+	refreshCookie := setCookie("refresh_token", "/", s.conf.Auth.Refresh.Expiration, refreshToken.Value)
 
 	c.SetCookie(accessCookie)
 	c.SetCookie(refreshCookie)
 
-	return c.JSON(http.StatusOK, nil)
+	response := dto.LoginResponse{
+		ID: user.ID,
+		Name: user.Name,
+		Email: user.Email,
+		Admin: user.Admin,
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (s Server) LogOut(c echo.Context) error {
+	accessCookie := setCookie("access_token", "/", -1, "")
+	refreshCookie := setCookie("refresh_token", "/", -1, "")
+
+	c.SetCookie(accessCookie)
+	c.SetCookie(refreshCookie)
+
+	return c.JSON(http.StatusNoContent, nil)
 }
 
 func (s Server) RefreshTokens(c echo.Context) error {
@@ -65,8 +89,8 @@ func (s Server) RefreshTokens(c echo.Context) error {
 		return err
 	}
 
-	accessCookie := setCookieFromToken("access_token", "/", s.conf.Auth.Access.Expiration, *accessToken)
-	refreshCookie := setCookieFromToken("refresh_token", "/", s.conf.Auth.Refresh.Expiration, *refreshToken)
+	accessCookie := setCookie("access_token", "/", s.conf.Auth.Access.Expiration, accessToken.Value)
+	refreshCookie := setCookie("refresh_token", "/", s.conf.Auth.Refresh.Expiration, refreshToken.Value)
 
 	c.SetCookie(accessCookie)
 	c.SetCookie(refreshCookie)

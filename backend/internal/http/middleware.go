@@ -5,6 +5,8 @@ import (
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/golang-jwt/jwt/v5"
+
+	"net/http"
 )
 
 func GetAccessMiddleware(signingKey string, signingMethod string) echo.MiddlewareFunc {
@@ -15,6 +17,9 @@ func GetAccessMiddleware(signingKey string, signingMethod string) echo.Middlewar
 		SigningMethod: signingMethod,
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(entities.Claims)
+		},
+		ErrorHandler: func(c echo.Context, err error) error {
+			return echo.NewHTTPError(http.StatusUnauthorized, "missing or malformed jwt")
 		},
 	})
 

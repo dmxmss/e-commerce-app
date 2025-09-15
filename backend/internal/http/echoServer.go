@@ -116,6 +116,8 @@ func (s Server) setUpRouter() { // routes, middleware
 	auth.POST("/signup", s.SignUp)	
 	auth.POST("/login", s.LogIn)	
 	auth.POST("/refresh", s.RefreshTokens, refreshMiddleware)	
+	auth.POST("/logout", s.LogOut, accessMiddleware)
+	auth.GET("/me", s.GetUserInfo, accessMiddleware)
 
 	users.GET("", s.GetUsers)
 	users.GET("/:id", s.GetUser)
@@ -131,6 +133,4 @@ func (s Server) setUpRouter() { // routes, middleware
 
 	payments.POST("", s.CreatePayment)
 	payments.GET("/:id", s.GetPayment)
-
-	api.GET("/me", s.GetUserInfo, accessMiddleware)
 }

@@ -1,16 +1,14 @@
 package http
 
 import (
-	"github.com/dmxmss/e-commerce-app/entities"
-
 	"net/http"
 )
 
-func setCookieFromToken(name string, path string, age int, token entities.AuthToken) *http.Cookie {
+func setCookie(name string, path string, age int, value string) *http.Cookie {
 	cookie := new(http.Cookie)
 
 	cookie.Name = name
-	cookie.Value = token.Value
+	cookie.Value = value
 	cookie.Path = path
 	cookie.HttpOnly = true
 	cookie.Secure = true
