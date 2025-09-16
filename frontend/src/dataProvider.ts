@@ -46,7 +46,7 @@ const dataProvider: DataProvider = {
     const data = await response.json();
 
     return {
-      data: data,
+      data: data.data,
     };
   },
 

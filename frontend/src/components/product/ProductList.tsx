@@ -1,4 +1,4 @@
-import { List, Datagrid, TextField, NumberField, DateField } from "react-admin";
+import { List, Datagrid, TextField, NumberField, DateField, ReferenceField } from "react-admin";
 
 const ProductList = () => (
   <List>
@@ -10,8 +10,12 @@ const ProductList = () => (
       <DateField source="updated_at" showTime />
       <NumberField source="price" />
       <NumberField source="remaining" />
-      <NumberField source="vendor_id" />
-      <NumberField source="category_id" />
+      <ReferenceField source="vendor_id" reference="users" sortBy="name">
+        <TextField source="name" />
+      </ReferenceField>
+      <ReferenceField source="category_id" reference="categories" sortBy="name">
+        <TextField source="name" />
+      </ReferenceField>
     </Datagrid>
   </List>
 );
