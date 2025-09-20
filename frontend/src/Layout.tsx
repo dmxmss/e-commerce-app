@@ -1,9 +1,15 @@
-import type { ReactNode } from "react";
-import { Layout as RALayout, CheckForApplicationUpdate } from "react-admin";
+import { Outlet } from "react-router-dom";
+import Header from "./components/pages/Header.tsx";
 
-export const Layout = ({ children }: { children: ReactNode }) => (
-  <RALayout>
-    {children}
-    <CheckForApplicationUpdate />
-  </RALayout>
-);
+const Layout = () => {
+  return (
+    <div className="flex-1 min-w-screen min-h-screen">
+      <Header />
+      <main>
+        <Outlet />
+      </main>
+    </div>
+  );
+};
+
+export default Layout;

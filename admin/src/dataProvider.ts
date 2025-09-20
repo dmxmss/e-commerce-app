@@ -36,7 +36,7 @@ const dataProvider: DataProvider = {
 
   getMany: async (resource, params) => {
     let ids = "";
-    for (let id of params.ids) {
+    for (const id of params.ids) {
       ids += `ids=${id}&`;
     }
 

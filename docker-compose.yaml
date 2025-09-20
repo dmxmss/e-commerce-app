@@ -9,13 +9,48 @@ services:
     environment:
       DATABASE_PASSWORD: mypassword
       PAYMENT_KEY: ${STRIPE_API_KEY}
-  frontend:
+  admin_prod:
     build:
-      dockerfile: frontend.Dockerfile
+      dockerfile: ./admin/Dockerfile
+      target: prod
     depends_on:
       - backend
     ports:
       - "3000:80"
+    profiles: ["prod"]
+  admin_dev:
+    build:
+      dockerfile: ./admin/Dockerfile
+      target: dev
+    depends_on:
+      - backend
+    ports:
+      - "3000:5173"
+    volumes:
+      - ./admin/node_modules:/app/node_modules
+      - ./admin/src:/app/src
+    profiles: ["dev"]
+  frontend_prod:
+    build:
+      dockerfile: ./frontend/Dockerfile
+      target: prod
+    depends_on:
+      - backend
+    ports:
+      - "3001:80"
+    profiles: ["prod"]
+  frontend_dev:
+    build:
+      dockerfile: ./frontend/Dockerfile
+      target: dev
+    depends_on:
+      - backend
+    ports:
+      - "3001:5173"
+    volumes: 
+      - ./frontend/node_modules:/app/node_modules
+      - ./frontend/src:/app/src
+    profiles: ["dev"]
   db:
     image: postgres:17.4-alpine3.21
     environment:

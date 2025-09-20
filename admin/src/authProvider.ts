@@ -12,15 +12,15 @@ const authProvider: AuthProvider = {
       body: JSON.stringify({
         name: username,
         password: password,
-      })});
-    
-    let response;
-    response = await fetch(request);
+      }),
+    });
+
+    const response = await fetch(request);
 
     if (response.status < 200 || response.status >= 300) {
       throw new Error(response.statusText);
     }
-    let auth = await response.json();
+    const auth = await response.json();
     if (!auth.admin) {
       throw new Error("You are not admin");
     }
@@ -62,10 +62,10 @@ const authProvider: AuthProvider = {
     if (!res.ok) return Promise.reject();
     const credentials = await res.json();
 
-    const { id, name } = crendentials;
+    const { id, name } = credentials;
 
-    return { id, name }
-  }
-}
+    return { id, name };
+  },
+};
 
 export default authProvider;
