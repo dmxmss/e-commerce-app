@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import type { Product } from "./types.ts";
+import { useCart } from "../cart/CartContext.tsx";
 
 const ProductDetailsPage = () => {
+  const { addToCart } = useCart();
+
   const { id } = useParams<{id: string}>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -57,7 +60,9 @@ const ProductDetailsPage = () => {
             <p className="text-2xl font-semibold text-green-600">${product.price}</p>
           </div>
 
-          <button className="mt-8 bg-green-500 text-white font-medium text-lg py-3 rounded-xl hover:bg-green-600 transition-colors">
+          <button className="mt-8 bg-green-500 text-white font-medium text-lg py-3 rounded-xl hover:bg-green-600 transition-colors" 
+                  onClick={() => addToCart(product)}
+          >
             Add to cart
           </button>
         </div>
