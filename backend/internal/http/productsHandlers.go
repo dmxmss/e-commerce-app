@@ -72,6 +72,11 @@ func (s Server) GetProducts(c echo.Context) error {
 
 	var response dto.GetProductsResponse
 	for _, product := range products {
+		var images []string
+		for _, image := range product.Images {
+			images = append(images, image.URL)
+		}
+
 		response.Data = append(response.Data, dto.Product{
 			ID: product.ID,
 			CreatedAt: product.CreatedAt, 
@@ -82,6 +87,7 @@ func (s Server) GetProducts(c echo.Context) error {
 			Remaining: product.Remaining,
 			Price: product.Price,
 			Category: product.CategoryID,
+			Images: images,
 		})
 	}
 
@@ -103,6 +109,11 @@ func (s Server) GetProduct(c echo.Context) error {
 		return err
 	}
 
+	var images []string
+	for _, image := range product.Images {
+		images = append(images, image.URL)
+	}
+
 	response := dto.Product{
 		ID: product.ID,
 		Description: product.Description,
@@ -113,6 +124,7 @@ func (s Server) GetProduct(c echo.Context) error {
 		Remaining: product.Remaining,
 		Price: product.Price,
 		Category: product.CategoryID,
+		Images: images,
 	}
 
 	c.JSON(http.StatusOK, response)

@@ -8,4 +8,5 @@ export interface Product {
   vendor_id: number;
   remaining: number;
   category_id: number;
+  images: string[];
 }

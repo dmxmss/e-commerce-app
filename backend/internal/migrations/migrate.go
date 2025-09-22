@@ -28,4 +28,5 @@ func main() {
 	db.AutoMigrate(&entities.User{})
 	db.AutoMigrate(&entities.Product{})
 	db.AutoMigrate(&entities.Category{})
+	db.AutoMigrate(&entities.ProductImage{})
 }

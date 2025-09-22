@@ -43,11 +43,11 @@ const ProductDetailsPage = () => {
       </header>
 
       <main className="flex flex-col lg:flex-row flex-1 max-w-6xl mx-auto w-full bg-white shadow-lg rounded-xl overflow-hidden my-8">
-        <div className="flex-1 flex items-center justify-center bg-gray-100 p-8">
+        <div className="flex-1 flex items-center justify-center bg-gray-100">
           <img
-            src={product.image}
+            src={`http://localhost:3002/${product.images[0]}`}
             alt={product.title}
-            className="max-h-[500px] object-contain transition-transform duration-300 hover:scale-105"
+            className="max-h-[500px] object-contain"
           />
         </div>
 

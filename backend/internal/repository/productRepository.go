@@ -40,7 +40,7 @@ func (r *productRepository) CreateProduct(product entities.Product) (*entities.P
 func (r *productRepository) GetProduct(id int) (*entities.Product, error) {
 	var product entities.Product
 
-	if err := r.db.Where("id = ?", id).Take(&product).Error; err != nil {
+	if err := r.db.Preload("Images").Where("id = ?", id).Take(&product).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, e.DbRecordNotFound{Err: fmt.Sprintf("not found product with id %d", id)}
 		} else {
@@ -55,7 +55,7 @@ func (r *productRepository) GetProducts(params dto.GetProductParams) ([]entities
 	var products []entities.Product
 	var total int64
 
-	q := r.db.Model(&entities.Product{})
+	q := r.db.Preload("Images").Model(&entities.Product{})
 
 	if params.Target == "vendorId" && params.ID != 0 {
 		q = q.Where("vendor = ?", params.ID)

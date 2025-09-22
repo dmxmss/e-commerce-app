@@ -18,7 +18,7 @@ const dataProvider: DataProvider = {
     const data = await response.json();
 
     return {
-      data: data.data,
+      data: data.data || [],
       total: data.total,
     };
   },
@@ -97,7 +97,7 @@ const dataProvider: DataProvider = {
   },
 
   updateMany: async (resource, params) => {
-    const responses = await Promise.All(
+    const responses = await Promise.all(
       params.ids.map((id) => {
         fetch(`${apiUrl}/${resource}/${id}`, {
           method: "PUT",
@@ -118,7 +118,7 @@ const dataProvider: DataProvider = {
   },
 
   deleteMany: async (resource, params) => {
-    await Promise.All(
+    await Promise.all(
       params.ids.map((id) => {
         fetch(`${apiUrl}/${resource}/${id}`, { method: "DELETE" });
       }),

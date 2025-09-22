@@ -13,7 +13,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 w-64 m-4 flex flex-col">
       <div className="flex flex-col flex-1">
         <Link key={product.id} to={`/products/${product.id}`}>
-          <img src="#" alt={product.name} className="h-48 w-full object-contain bg-gray-100 p-4 mb-2" />
+          <img src={`http://localhost:3002/${product.images[0]}`} alt={product.name} className="h-48 w-full object-contain bg-gray-100 p-4 mb-2" />
         </Link>
         <div className="p-4">
           <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">

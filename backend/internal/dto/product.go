@@ -15,6 +15,7 @@ type Product struct {
 	Remaining int `json:"remaining"`
 	Price int `json:"price"`
 	Category int `json:"category_id"`
+	Images []string `json:"images"`
 }
 
 type CreateProductRequest struct {

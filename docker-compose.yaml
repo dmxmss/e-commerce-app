@@ -1,17 +1,17 @@
 services:
   backend:
     build: 
-      dockerfile: backend.Dockerfile
+      context: ./backend
     depends_on:
       - db
     ports:
       - "8080:8080"
     environment:
-      DATABASE_PASSWORD: mypassword
+      DATABASE_PASSWORD: ${DB_PASSWORD}
       PAYMENT_KEY: ${STRIPE_API_KEY}
   admin_prod:
     build:
-      dockerfile: ./admin/Dockerfile
+      context: ./admin
       target: prod
     depends_on:
       - backend
@@ -20,7 +20,7 @@ services:
     profiles: ["prod"]
   admin_dev:
     build:
-      dockerfile: ./admin/Dockerfile
+      context: ./admin
       target: dev
     depends_on:
       - backend
@@ -32,7 +32,7 @@ services:
     profiles: ["dev"]
   frontend_prod:
     build:
-      dockerfile: ./frontend/Dockerfile
+      context: ./frontend
       target: prod
     depends_on:
       - backend
@@ -41,7 +41,7 @@ services:
     profiles: ["prod"]
   frontend_dev:
     build:
-      dockerfile: ./frontend/Dockerfile
+      context: ./frontend
       target: dev
     depends_on:
       - backend
@@ -51,11 +51,20 @@ services:
       - ./frontend/node_modules:/app/node_modules
       - ./frontend/src:/app/src
     profiles: ["dev"]
+  image:
+    build:
+      context: ./image_server
+    depends_on:
+      - db
+    ports:
+      - "3002:8080"
+    volumes:
+      - ./image_server/images:/app/images
   db:
     image: postgres:17.4-alpine3.21
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: mypassword
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
