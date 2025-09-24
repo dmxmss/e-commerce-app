@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import type { Product } from "./types.ts";
 import ProductCard from "./ProductCard.tsx";
+import { config } from "../../config.ts";
 
 const ProductsPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -8,7 +9,7 @@ const ProductsPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/products")
+    fetch(`${config.baseApi}/products`)
       .then((res) => {
         if (!res.ok) throw new Error("Loading error");
         return res.json();

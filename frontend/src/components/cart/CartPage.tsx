@@ -1,4 +1,5 @@
 import { useCart } from "./CartContext.tsx";
+import { config } from "../../config.ts";
 
 const CartPage = () => {
   const { cart, addToCart, removeOneFromCart, clearCart } = useCart();
@@ -25,7 +26,7 @@ const CartPage = () => {
             className="flex justify-between items-center border-b pb-4 last:border-none"
           >
             <div className="flex items-center gap-4">
-              <img src="#" alt={item.name} className="w-20 h-20 bg-gray-300 object-cover rounded-lg" />
+              <img src={`${config.imageServer}/${item.images[0]}`} alt={item.name} className="w-20 h-20 bg-gray-300 object-cover rounded-lg" />
               <div>
                 <h3 className="text-lg font-semibold">{item.name}</h3>
                 <p className="text-gray-500">${item.price.toFixed(2)}</p>

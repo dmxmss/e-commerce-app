@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import type { Product } from "./types.ts";
 import { useCart } from "../cart/CartContext.tsx";
+import { config } from "../../config.ts";
 
 const ProductDetailsPage = () => {
   const { addToCart } = useCart();
@@ -14,7 +15,7 @@ const ProductDetailsPage = () => {
   useEffect(() => {
     if (!id) return;
     
-    fetch(`http://localhost:3001/api/products/${id}`)
+    fetch(`${config.baseApi}/products/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error("Loading error");
         return res.json();
@@ -45,7 +46,7 @@ const ProductDetailsPage = () => {
       <main className="flex flex-col lg:flex-row flex-1 max-w-6xl mx-auto w-full bg-white shadow-lg rounded-xl overflow-hidden my-8">
         <div className="flex-1 flex items-center justify-center bg-gray-100">
           <img
-            src={`http://localhost:3002/${product.images[0]}`}
+            src={`${config.imageServer}/${product.images[0]}`}
             alt={product.name}
             className="max-h-[500px] object-contain"
           />
