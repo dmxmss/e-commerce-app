@@ -93,7 +93,7 @@ const dataProvider: DataProvider = {
     });
 
     const data = await response.json();
-    return { data };
+    return { data: data };
   },
 
   updateMany: async (resource, params) => {

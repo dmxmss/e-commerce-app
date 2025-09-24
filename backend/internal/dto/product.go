@@ -57,6 +57,7 @@ type UpdateProductRequest struct {
 }
 
 type UpdateProductResponse struct {
+	ID int `json:"id"`
 	Name string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
 	Remaining int `json:"remaining,omitempty"`

@@ -46,7 +46,7 @@ const ProductDetailsPage = () => {
         <div className="flex-1 flex items-center justify-center bg-gray-100">
           <img
             src={`http://localhost:3002/${product.images[0]}`}
-            alt={product.title}
+            alt={product.name}
             className="max-h-[500px] object-contain"
           />
         </div>

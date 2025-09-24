@@ -160,8 +160,9 @@ func (s Server) UpdateProduct(c echo.Context) error {
 	}
 
 	response := dto.UpdateProductResponse{
-		Description: product.Description,
+		ID: product.ID,
 		Name: product.Name,
+		Description: product.Description,
 		Remaining: product.Remaining,
 		Price: product.Price,
 		CategoryID: product.CategoryID,
