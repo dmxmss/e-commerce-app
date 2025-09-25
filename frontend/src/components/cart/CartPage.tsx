@@ -2,7 +2,7 @@ import { useCart } from "./CartContext.tsx";
 import { config } from "../../config.ts";
 
 const CartPage = () => {
-  const { cart, addToCart, removeOneFromCart, clearCart } = useCart();
+  const { cart, addToCart, removeOneFromCart, clearCart, createPayment } = useCart();
 
   if (cart.length === 0) {
     return (
@@ -56,13 +56,22 @@ const CartPage = () => {
         <p className="text-xl font-bold">
           Total: <span className="text-green-600">${totalPrice.toFixed(2)}</span>
         </p>
+      
+        <div>
+          <button 
+            className="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition mr-4"
+            onClick={createPayment}
+          >
+            Buy
+          </button>
 
-        <button 
-          className="bg-red-500 text-white px-6 py-2 rounded-xl hover:bg-red-600 transition"
-          onClick={clearCart}
-        >
-          Clear cart
-        </button>
+          <button 
+            className="bg-red-500 text-white px-6 py-2 rounded-xl hover:bg-red-600 transition"
+            onClick={clearCart}
+          >
+            Clear cart
+          </button>
+        </div>
       </div>
     </div>
   );

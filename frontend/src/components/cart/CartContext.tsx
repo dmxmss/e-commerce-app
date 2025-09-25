@@ -1,11 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-
-export type CartItem = {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-};
+import { useNavigate } from "react-router-dom";
+import { config } from "../../config.ts";
+import type { CartItem } from "../../types.ts";
 
 type CartContextType = {
   cart: CartItem[];
@@ -13,6 +9,7 @@ type CartContextType = {
   removeOneFromCart: (id: number) => void;
   removeFromCart: (id: number) => void;
   clearCart: () => void;
+  createPayment: () => void;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -22,6 +19,8 @@ const CartProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
   });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
@@ -59,8 +58,25 @@ const CartProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
 
   const clearCart = () => setCart([]);
 
+  const createPayment = () => {
+    fetch(`${config.baseApi}/payments`, {
+      method: "POST",
+      body: JSON.stringify({
+        product_ids: cart.map((item) => item.id),
+        currency: "USD",
+      })
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(res.message);
+        return res.json();
+    })
+      .then((data) => {
+        navigate(`${config.host}/checkout`, { state: { clientSecret: data.client_secret }});
+    })
+  };
+
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, removeOneFromCart, clearCart }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, removeOneFromCart, clearCart, createPayment }}>
       {children}
     </CartContext.Provider>
   )

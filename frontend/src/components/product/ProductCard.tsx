@@ -1,5 +1,5 @@
 import React from "react";
-import type { Product } from "./types.ts";
+import type { Product } from "../../types.ts";
 import { Link } from "react-router-dom";
 import { useCart } from "../cart/CartContext.tsx";
 import { config } from "../../config.ts";

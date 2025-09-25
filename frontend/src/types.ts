@@ -1,3 +1,10 @@
+export type CartItem = {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+};
+
 export interface Product {
   id: number;
   created_at: Date;

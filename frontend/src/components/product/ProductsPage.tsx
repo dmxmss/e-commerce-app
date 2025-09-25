@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { Product } from "./types.ts";
+import type { Product } from "../../types.ts";
 import ProductCard from "./ProductCard.tsx";
 import { config } from "../../config.ts";
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import type { Product } from "./types.ts";
+import type { Product } from "../../types.ts";
 import { useCart } from "../cart/CartContext.tsx";
 import { config } from "../../config.ts";
 
