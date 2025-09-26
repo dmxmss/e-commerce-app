@@ -1,9 +1,16 @@
 package dto
 
 type LoginRequest struct {
-	Name string `json:"name"`
+	Name string `json:"name,omitempty"`
+	Email string `json:"email,omitempty"`
 	Password string `json:"password"`
-	IsAdmin bool `json:"admin"`
+}
+
+type SignupResponse struct {
+	ID int `json:"id"`
+	Name string `json:"name"`
+	Email string `json:"email"`
+	Admin bool `json:"admin"`
 }
 
 type LoginResponse struct {

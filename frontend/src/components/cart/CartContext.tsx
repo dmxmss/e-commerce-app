@@ -59,19 +59,27 @@ const CartProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
   const clearCart = () => setCart([]);
 
   const createPayment = () => {
+    const products = cart.filter((item) => item.quantity > 0);
+    if (products.length == 0) {
+      return;
+    }
+
     fetch(`${config.baseApi}/payments`, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
-        product_ids: cart.map((item) => item.id),
+        product_ids: products.map((item) => item.id),
         currency: "USD",
       })
     })
       .then((res) => {
-        if (!res.ok) throw new Error(res.message);
+        if (!res.ok) throw new Error(res.statusText);
         return res.json();
     })
       .then((data) => {
-        navigate(`${config.host}/checkout`, { state: { clientSecret: data.client_secret }});
+        navigate("checkout", { state: { clientSecret: data.client_secret }});
     })
   };
 

@@ -4,6 +4,7 @@ import Layout from "./Layout.tsx";
 import Dashboard from "./components/pages/Dashboard.tsx"
 import CartPage from "./components/cart/CartPage.tsx";
 import PaymentPage from "./components/pages/PaymentPage.tsx";
+import LoginPage from "./components/pages/LoginPage.tsx";
 import NotFoundPage from "./components/pages/NotFoundPage.tsx";
 
 import CartProvider from "./components/cart/CartContext.tsx"
@@ -18,6 +19,7 @@ function App() {
             <Route path="/products/:id" element={<ProductDetailsPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<PaymentPage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>

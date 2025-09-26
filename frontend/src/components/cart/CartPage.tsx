@@ -35,14 +35,14 @@ const CartPage = () => {
 
             <div className="flex items-center gap-4">
               <button
-                className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 transition"
-                onClick={() => addToCart({ id: item.id, name: item.name, price: item.price })}
+                className="px-3 py-1 w-8 h-8 bg-gray-200 rounded-lg hover:bg-gray-300 transition"
+                onClick={() => addToCart({ id: item.id, name: item.name, price: item.price, images: item.images })}
               >
                 +
               </button>
               <span className="min-w-[2rem] text-center">{item.quantity}</span>
               <button
-                className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 transition"
+                className="px-3 py-1 w-8 h-8 bg-gray-200 rounded-lg hover:bg-gray-300 transition"
                 onClick={() => removeOneFromCart(item.id)}
               >
                 -

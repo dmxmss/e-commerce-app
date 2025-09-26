@@ -28,7 +28,7 @@ func (s Server) SignUp(c echo.Context) error {
 	c.SetCookie(accessCookie)
 	c.SetCookie(refreshCookie)
 
-	response := dto.LoginResponse{
+	response := dto.SignupResponse{
 		ID: user.ID,
 		Name: user.Name,
 		Email: user.Email,
@@ -45,7 +45,7 @@ func (s Server) LogIn(c echo.Context) error {
 		return err
 	}
 
-	user, accessToken, refreshToken, err := s.service.auth.Login(request.Name, request.Password)
+	user, accessToken, refreshToken, err := s.service.auth.Login(request)
 	if err != nil {
 		return err
 	}

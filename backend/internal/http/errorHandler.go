@@ -8,23 +8,29 @@ import (
 )
 
 func (s Server) ErrorHandler(err error, c echo.Context) {
-	code := http.StatusInternalServerError
+	var code int
 	var msg string
 
 	switch err.(type) {
 	case e.UserAlreadyExists:
 		code = http.StatusConflict
+		msg = err.Error()
 	case e.InvalidUserId:
 		code = http.StatusBadRequest
+		msg = err.Error()
 	case e.InvalidCredentials:
 		code = http.StatusUnauthorized
+		msg = err.Error()
 	case e.DbRecordNotFound:
 		code = http.StatusNotFound
+		msg = err.Error()
 	case e.InvalidInputError:
 		code = http.StatusBadRequest
+		msg = err.Error()
+	default:
+		code = http.StatusInternalServerError
+		msg = "internal server error"
 	}
-
-	msg = err.Error()
 
 	if he, ok := err.(*echo.HTTPError); ok {
     code = he.Code

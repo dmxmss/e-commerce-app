@@ -13,8 +13,8 @@ import (
 )
 
 type AuthService interface {
-	SignUp(name, email, password string) (*entities.User, *entities.AuthToken, *entities.AuthToken, error)
-	Login(name, password string) (*entities.User, *entities.AuthToken, *entities.AuthToken, error)
+	SignUp(string, string, string) (*entities.User, *entities.AuthToken, *entities.AuthToken, error)
+	Login(dto.LoginRequest) (*entities.User, *entities.AuthToken, *entities.AuthToken, error)
 	GenerateTokens(bool, string) (*entities.AuthToken, *entities.AuthToken, error)
 }
 
@@ -63,8 +63,13 @@ func (s *authService) SignUp(name, email, password string) (*entities.User, *ent
 	return user, accessToken, refreshToken, nil
 }
 
-func (s *authService) Login(name, password string) (*entities.User, *entities.AuthToken, *entities.AuthToken, error) {
-	users, total, err := s.repo.user.GetUsers(dto.GetUsersParams{Name: name})
+func (s *authService) Login(login dto.LoginRequest) (*entities.User, *entities.AuthToken, *entities.AuthToken, error) {
+	params := dto.GetUsersParams{
+		Name: login.Name,
+		Email: login.Email,
+	}
+
+	users, total, err := s.repo.user.GetUsers(params)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -75,7 +80,7 @@ func (s *authService) Login(name, password string) (*entities.User, *entities.Au
 
 	user := users[0]
 
-	if user.Password != password {
+	if user.Password != login.Password {
 		return nil, nil, nil, e.InvalidCredentials{}
 	}
 
