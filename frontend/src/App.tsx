@@ -7,23 +7,26 @@ import PaymentPage from "./components/pages/PaymentPage.tsx";
 import LoginPage from "./components/pages/LoginPage.tsx";
 import NotFoundPage from "./components/pages/NotFoundPage.tsx";
 
-import CartProvider from "./components/cart/CartContext.tsx"
+import CartProvider from "./components/cart/CartContext.tsx";
+import AuthProvider from "./components/auth/AuthContext.tsx";
 
 function App() {
   return (
     <Router>
-      <CartProvider>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="/products/:id" element={<ProductDetailsPage />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/checkout" element={<PaymentPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Route>
-        </Routes>
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="/products/:id" element={<ProductDetailsPage />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/checkout" element={<PaymentPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Route>
+          </Routes>
+        </CartProvider>
+      </AuthProvider>
     </Router>
   )
 }

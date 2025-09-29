@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { config } from "../../config.ts";
+import { useAuth } from "../auth/AuthContext.tsx";
 
 const LoginPage = () => {
+  const { checkAuth } = useAuth();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -33,7 +35,8 @@ const LoginPage = () => {
       })
     }) 
       .then((res) => {
-        if(!res.ok) throw new Error("Login error");
+        if (!res.ok) throw new Error("Login error");
+        checkAuth();
       })
 
     navigate("/");

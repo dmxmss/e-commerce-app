@@ -18,3 +18,9 @@ export interface Product {
   category_id: number;
   images: string[];
 }
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+}

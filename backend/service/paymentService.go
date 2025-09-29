@@ -46,7 +46,7 @@ func (s *stripeService) CreatePayment(ctx context.Context, productIds []int, cur
 			return nil, e.PaymentFailed{Err: fmt.Sprintf("no products left with id %d", product.ID)}
 		}
 
-		amount += int64(product.Price)
+		amount += int64(product.Price) * 100 // price is in dollars, but stripe accepts in cents
 	}
 
 	payment, err := s.repo.payment.CreatePayment(ctx, amount, currency, metadata)

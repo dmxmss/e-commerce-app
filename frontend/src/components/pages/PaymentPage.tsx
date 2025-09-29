@@ -2,7 +2,7 @@ import React from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, useStripe, useElements, PaymentElement } from "@stripe/react-stripe-js";
 import { config } from "../../config.ts";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const stripePromise = loadStripe(config.stripePublicKey);
 
@@ -41,11 +41,13 @@ const CheckoutForm = () => {
 }
 
 const PaymentPage = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const clientSecret = location.state?.clientSecret;
 
   if (!clientSecret) {
-    throw new Error("User did not provide client secret")
+    navigate("/");
+    throw new Error("User did not provide client secret");
   }
 
   const options = { clientSecret };
