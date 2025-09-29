@@ -40,17 +40,7 @@ func (s Server) CreateProduct(c echo.Context) error {
 		return err
 	}
 
-	response := dto.CreateProductResponse{
-		ID: product.ID,
-		CreatedAt: product.CreatedAt,
-		UpdatedAt: product.UpdatedAt,
-		Name: product.Name,
-		Description: product.Description,
-		Vendor: product.Vendor,
-		Remaining: product.Remaining,
-		Price: product.Price,
-		Category: product.CategoryID,
-	}
+	response := product.ToResponse()
 
 	return c.JSON(http.StatusOK, response)
 }
@@ -72,23 +62,7 @@ func (s Server) GetProducts(c echo.Context) error {
 
 	var response dto.GetProductsResponse
 	for _, product := range products {
-		var images []string
-		for _, image := range product.Images {
-			images = append(images, image.URL)
-		}
-
-		response.Data = append(response.Data, dto.Product{
-			ID: product.ID,
-			CreatedAt: product.CreatedAt, 
-			UpdatedAt: product.UpdatedAt,
-			Name: product.Name, 
-			Description: product.Description,
-			Vendor: product.Vendor,
-			Remaining: product.Remaining,
-			Price: product.Price,
-			Category: product.CategoryID,
-			Images: images,
-		})
+		response.Data = append(response.Data, product.ToResponse())
 	}
 
 	response.Total = total
@@ -114,18 +88,7 @@ func (s Server) GetProduct(c echo.Context) error {
 		images = append(images, image.URL)
 	}
 
-	response := dto.Product{
-		ID: product.ID,
-		Description: product.Description,
-		CreatedAt: product.CreatedAt, 
-		UpdatedAt: product.UpdatedAt,
-		Name: product.Name,
-		Vendor: product.Vendor,
-		Remaining: product.Remaining,
-		Price: product.Price,
-		Category: product.CategoryID,
-		Images: images,
-	}
+	response := product.ToResponse()
 
 	c.JSON(http.StatusOK, response)
 	return nil

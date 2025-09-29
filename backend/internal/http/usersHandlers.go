@@ -23,11 +23,7 @@ func (s Server) GetUser(c echo.Context) error {
 		return err
 	}
 
-	response := dto.GetUserResponse{
-		ID: user.ID,
-		Name: user.Name,
-		Email: user.Email,
-	}
+	response := user.ToResponse()
 
 	c.JSON(http.StatusOK, response)
 	return nil
@@ -50,11 +46,7 @@ func (s Server) GetUsers(c echo.Context) error {
 	var response dto.GetUsersResponse
 
 	for _, user := range users {
-		response.Data = append(response.Data, dto.User{
-			ID: user.ID,
-			Name: user.Name,
-			Email: user.Email,
-		})
+		response.Data = append(response.Data, user.ToResponse())
 	}
 
 	response.Total = total;
@@ -77,11 +69,7 @@ func (s Server) GetUserInfo(c echo.Context) error {
 		return err
 	}
 
-	response := dto.GetUserResponse{
-		ID: user.ID,
-		Name: user.Name,
-		Email: user.Email,
-	}
+	response := user.ToResponse()
 
 	return c.JSON(http.StatusOK, response)
 }
