@@ -66,17 +66,13 @@ func (r *productRepository) GetProducts(params dto.GetProductParams) ([]entities
 	// TODO: add filtering by price, remaining, category, created and updated date
 	// TODO: add allowed sorting fields 
 
-	if params.SortField != "" && params.SortOrder != "" {
-		q = q.Order(params.SortField + " " + params.SortOrder)
-	}
+	handleSorting(q, params.SortField, params.SortOrder)
 
 	if err := q.Count(&total).Error; err != nil {
 		return nil, 0, e.DbTransactionFailed{Err: err.Error()}
 	}
 
-	if params.Page != 0 && params.PerPage != 0 {
-		q = q.Limit(params.PerPage).Offset((params.Page - 1)*params.PerPage)
-	}
+	handlePagination(q, params.Page, params.PerPage)
 
 	if err := q.Find(&products).Error; err != nil {
 		return nil, 0, e.DbTransactionFailed{Err: err.Error()}

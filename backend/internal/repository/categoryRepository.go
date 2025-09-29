@@ -48,17 +48,13 @@ func (r *categoryRepository) GetCategories(params dto.GetCategoriesParams) ([]en
 		q = q.Where("id IN ?", params.IDs)
 	}
 
-	if params.SortField != "" && params.SortOrder != "" {
-		q = q.Order(params.SortField + " " + params.SortOrder)
-	}
+	handleSorting(q, params.SortField, params.SortOrder)
 
 	if err := q.Count(&total).Error; err != nil {
 		return nil, 0, e.DbTransactionFailed{Err: err.Error()}
 	}
 
-	if params.Page != 0 && params.PerPage != 0 {
-		q = q.Limit(params.PerPage).Offset((params.Page - 1)*params.PerPage)
-	}
+	handlePagination(q, params.Page, params.PerPage)
 
 	if err := q.Find(&categories).Error; err != nil {
 		return nil, 0, e.DbTransactionFailed{Err: err.Error()}
