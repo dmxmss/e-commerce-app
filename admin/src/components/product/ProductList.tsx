@@ -1,11 +1,18 @@
-import { List, Datagrid, TextField, NumberField, DateField, ReferenceField } from "react-admin";
+import {
+  List,
+  Datagrid,
+  TextField,
+  NumberField,
+  DateField,
+  ReferenceField,
+} from "react-admin";
 
 const ProductList = () => (
   <List>
     <Datagrid>
       <TextField source="id" />
       <TextField source="name" />
-      <TextField source="description" />
+      <TextField source="description" sortable={false} />
       <DateField source="created_at" showTime />
       <DateField source="updated_at" showTime />
       <NumberField source="price" />

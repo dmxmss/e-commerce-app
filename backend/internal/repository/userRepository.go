@@ -55,7 +55,8 @@ func (r *userRepository) GetUser(id int) (*entities.User, error) {
 func (r *userRepository) GetUsers(params dto.GetUsersParams) ([]entities.User, int64, error) {
 	var users []entities.User	
 	var total int64
-	q:= r.db.Model(&entities.User{})
+
+	q := r.db.Model(&entities.User{})
 
 	if params.IDs != nil {
 		q = q.Where("id IN ?", params.IDs)
@@ -69,7 +70,11 @@ func (r *userRepository) GetUsers(params dto.GetUsersParams) ([]entities.User, i
 		q = q.Where("email = ?", params.Email)
 	}
 
-	handleSorting(q, params.SortField, params.SortOrder)
+	allowedFields := []string{"", "id", "name", "email"}
+
+	if err := handleSorting(q, params.SortField, params.SortOrder, allowedFields); err != nil {
+		return nil, 0, err
+	}
 
 	if err := q.Count(&total).Error; err != nil {
 		return nil, 0, e.DbTransactionFailed{Err: err.Error()}

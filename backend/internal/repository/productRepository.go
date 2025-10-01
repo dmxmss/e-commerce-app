@@ -64,9 +64,12 @@ func (r *productRepository) GetProducts(params dto.GetProductParams) ([]entities
 	} 
 
 	// TODO: add filtering by price, remaining, category, created and updated date
-	// TODO: add allowed sorting fields 
 
-	handleSorting(q, params.SortField, params.SortOrder)
+	allowedFields := []string{"", "id", "name", "created_at", "updated_at", "remaining", "price"}
+
+	if err := handleSorting(q, params.SortField, params.SortOrder, allowedFields); err != nil {
+		return nil, 0, err
+	}
 
 	if err := q.Count(&total).Error; err != nil {
 		return nil, 0, e.DbTransactionFailed{Err: err.Error()}

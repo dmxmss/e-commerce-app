@@ -48,7 +48,11 @@ func (r *categoryRepository) GetCategories(params dto.GetCategoriesParams) ([]en
 		q = q.Where("id IN ?", params.IDs)
 	}
 
-	handleSorting(q, params.SortField, params.SortOrder)
+	allowedFields := []string{"", "id", "name"}
+
+	if err := handleSorting(q, params.SortField, params.SortOrder, allowedFields); err != nil {
+		return nil, 0, err
+	}
 
 	if err := q.Count(&total).Error; err != nil {
 		return nil, 0, e.DbTransactionFailed{Err: err.Error()}
