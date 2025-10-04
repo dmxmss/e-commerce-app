@@ -40,6 +40,13 @@ type GetProductParams struct {
 	SortField string `query:"sortField"`
 	SortOrder string `query:"sortOrder"`
 	Target string `query:"target"`
+	PriceMax uint `query:"priceGreater"`
+	PriceMin uint `query:"priceLower"`
+	CreatedAfter Date `query:"createdAfter"`
+	CreatedBefore Date `query:"createdBefore"`
+	UpdatedAfter Date `query:"updatedAfter"`
+	UpdatedBefore Date `query:"updatedBefore"`
+	IsRemaining bool `query:"isRemaining"`
 	All url.Values `query:"-"`
 }
 

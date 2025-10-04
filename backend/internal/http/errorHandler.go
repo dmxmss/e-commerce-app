@@ -27,14 +27,12 @@ func (s Server) ErrorHandler(err error, c echo.Context) {
 	case e.InvalidInputError:
 		code = http.StatusBadRequest
 		msg = err.Error()
+	case *echo.HTTPError:
+		code = err.(*echo.HTTPError).Code
+		msg = fmt.Sprintf("%v", err.(*echo.HTTPError).Message)
 	default:
 		code = http.StatusInternalServerError
 		msg = "internal server error"
-	}
-
-	if he, ok := err.(*echo.HTTPError); ok {
-    code = he.Code
-		msg = fmt.Sprintf("%v", he.Message)
 	}
 
 	if !c.Response().Committed {

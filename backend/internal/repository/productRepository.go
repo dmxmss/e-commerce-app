@@ -64,6 +64,29 @@ func (r *productRepository) GetProducts(params dto.GetProductParams) ([]entities
 	} 
 
 	// TODO: add filtering by price, remaining, category, created and updated date
+	if params.PriceMax != 0 {
+		q = q.Where("price >= ?", params.PriceMax)
+	}
+	if params.PriceMin != 0 {
+		q = q.Where("price <= ?", params.PriceMin)
+	}
+
+	if params.CreatedAfter.Time != nil {
+		q = q.Where("created_at >= ?", params.CreatedAfter.Time)
+	}
+	if params.CreatedBefore.Time != nil {
+		q = q.Where("created_at <= ?", params.CreatedBefore.Time)
+	}
+	if params.UpdatedAfter.Time != nil {
+		q = q.Where("updated_at >= ?", params.UpdatedAfter.Time)
+	}
+	if params.UpdatedBefore.Time != nil {
+		q = q.Where("updated_at <= ?", params.UpdatedBefore.Time)
+	}
+
+	if params.IsRemaining {
+		q = q.Where("remaining > 0")
+	}
 
 	allowedFields := []string{"", "id", "name", "created_at", "updated_at", "remaining", "price"}
 
