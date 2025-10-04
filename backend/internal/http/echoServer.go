@@ -116,7 +116,7 @@ func (s Server) setUpRouter() { // routes, middleware
 	auth.POST("/signup", s.SignUp)	
 	auth.POST("/login", s.LogIn)	
 	auth.POST("/refresh", s.RefreshTokens, refreshMiddleware)	
-	auth.POST("/logout", s.LogOut, accessMiddleware)
+	auth.POST("/logout", s.LogOut)
 	auth.GET("/me", s.GetUserInfo, accessMiddleware)
 
 	users.GET("", s.GetUsers)

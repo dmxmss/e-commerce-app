@@ -9,6 +9,7 @@ import (
 
 	"errors"
 	"fmt"
+	"time"
 )
 
 type ProductRepository interface {
@@ -63,7 +64,6 @@ func (r *productRepository) GetProducts(params dto.GetProductParams) ([]entities
 		q = q.Where("id IN ?", params.IDs)
 	} 
 
-	// TODO: add filtering by price, remaining, category, created and updated date
 	if params.PriceMax != 0 {
 		q = q.Where("price >= ?", params.PriceMax)
 	}
@@ -88,6 +88,10 @@ func (r *productRepository) GetProducts(params dto.GetProductParams) ([]entities
 		q = q.Where("remaining > 0")
 	}
 
+	if params.CategoryID != 0 {
+		q = q.Where("category_id = ?", params.CategoryID)
+	}
+
 	allowedFields := []string{"", "id", "name", "created_at", "updated_at", "remaining", "price"}
 
 	if err := handleSorting(q, params.SortField, params.SortOrder, allowedFields); err != nil {
@@ -109,6 +113,7 @@ func (r *productRepository) GetProducts(params dto.GetProductParams) ([]entities
 
 func (r *productRepository) UpdateProduct(id int, request dto.UpdateProductRequest) (*entities.Product, error) {
 	var product entities.Product
+	request.UpdatedAt = time.Now()
 
 	if err := r.db.Model(&entities.Product{}).
 								 Clauses(clause.Returning{}).

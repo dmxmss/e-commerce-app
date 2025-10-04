@@ -20,7 +20,7 @@ type Product struct {
 
 type CreateProductRequest struct {
 	Name string `json:"name"`
-	Description string `json:"description,omitempty"`
+	Description string `json:"description"`
 	Remaining int `json:"remaining"`
 	Price int `json:"price"`
 	Category int `json:"category_id"`
@@ -47,6 +47,7 @@ type GetProductParams struct {
 	UpdatedAfter Date `query:"updatedAfter"`
 	UpdatedBefore Date `query:"updatedBefore"`
 	IsRemaining bool `query:"isRemaining"`
+	CategoryID int `query:"category_id"`
 	All url.Values `query:"-"`
 }
 
@@ -58,18 +59,19 @@ type GetProductsResponse struct {
 type UpdateProductRequest struct {
 	Name string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
-	Remaining int `json:"remaining,omitempty"`
+	Remaining *int `json:"remaining,omitempty"`
 	CategoryID int `json:"category_id,omitempty"`
 	Price int `json:"price,omitempty"`
+	UpdatedAt time.Time
 }
 
 type UpdateProductResponse struct {
 	ID int `json:"id"`
-	Name string `json:"name,omitempty"`
-	Description string `json:"description,omitempty"`
-	Remaining int `json:"remaining,omitempty"`
-	CategoryID int `json:"category_id,omitempty"`
-	Price int `json:"price,omitempty"`
+	Name string `json:"name"`
+	Description string `json:"description"`
+	Remaining int `json:"remaining"`
+	CategoryID int `json:"category_id"`
+	Price int `json:"price"`
 }
 
 type DeleteProductRequest struct {
